@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veritus Ventures — A2A Negotiation Dashboard v2.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  body { background:#0f172a; color:#e2e8f0; font-family:'Inter',system-ui,sans-serif; }
+  .card { background:#1e293b; border:1px solid #334155; border-radius:12px; }
+  .kpi-value { font-size:1.75rem; font-weight:700; line-height:1.1; }
+  .kpi-sub   { font-size:0.7rem; color:#64748b; margin-top:2px; }
+  .badge-green  { background:#052e16; color:#4ade80; border:1px solid #166534; }
+  .badge-yellow { background:#1c1917; color:#fbbf24; border:1px solid #92400e; }
+  .badge-red    { background:#1a0808; color:#f87171; border:1px solid #991b1b; }
+  .badge-blue   { background:#0c1a2e; color:#60a5fa; border:1px solid #1e40af; }
+  .badge-purple { background:#1a0a2e; color:#c084fc; border:1px solid #6b21a8; }
+  .badge-orange { background:#1c0f00; color:#fb923c; border:1px solid #9a3412; }
+  .badge { padding:2px 9px; border-radius:999px; font-size:0.7rem; font-weight:600; display:inline-block; }
+  .tab  { cursor:pointer; padding:7px 16px; border-radius:8px; font-size:0.82rem; font-weight:600; transition:all 0.15s; white-space:nowrap; }
+  .tab.active { background:#3b82f6; color:#fff; }
+  .tab:not(.active) { color:#94a3b8; }
+  .tab:not(.active):hover { background:#1e293b; color:#e2e8f0; }
+  .section { display:none; }
+  .section.active { display:block; }
+  table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+  th { background:#0f172a; color:#64748b; font-weight:600; text-align:left; padding:9px 12px; position:sticky; top:0; z-index:1; }
+  td { padding:8px 12px; border-bottom:1px solid #1e293b44; }
+  tr:hover td { background:#1e293b66; }
+  tr.sentinel-flagged td { background:#2a1800aa; }
+  tr.sentinel-flagged:hover td { background:#3a2200aa; }
+  .trajectory { display:flex; align-items:center; gap:3px; flex-wrap:wrap; }
+  .offer-chip { font-size:0.68rem; padding:2px 6px; border-radius:4px; }
+  .buyer-chip  { background:#1e3a5f; color:#60a5fa; }
+  .seller-chip { background:#1a2e1a; color:#4ade80; }
+  .spinner { animation:spin 1s linear infinite; }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  ::-webkit-scrollbar { width:5px; height:5px; }
+  ::-webkit-scrollbar-track { background:#0f172a; }
+  ::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
+  .progress-bar { height:5px; background:#1e293b; border-radius:3px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,#3b82f6,#8b5cf6); border-radius:3px; transition:width 0.4s ease; }
+  .chart-wrap { position:relative; height:220px; }
+  .savings-pos { color:#4ade80; }
+  .savings-neg { color:#f87171; }
+  .savings-zero { color:#94a3b8; }
+  .tag { display:inline-block; font-size:0.65rem; padding:1px 6px; border-radius:3px; margin:1px; background:#0f172a; border:1px solid #334155; color:#94a3b8; }
+  .tag-moq     { border-color:#7c3aed; color:#c084fc; }
+  .tag-vol     { border-color:#065f46; color:#34d399; }
+  .tag-llm     { border-color:#1d4ed8; color:#93c5fd; }
+  .tag-partial { border-color:#92400e; color:#fbbf24; }
+  .tag-batna   { border-color:#0f766e; color:#2dd4bf; }
+  .tag-delivery{ border-color:#0369a1; color:#38bdf8; }
+  .tag-payment { border-color:#065f46; color:#86efac; }
+  .tag-final   { border-color:#6b21a8; color:#e879f9; }
+  .tag-alert   { border-color:#991b1b; color:#fca5a5; }
+  .form-input { background:#0f172a; border:1px solid #334155; border-radius:8px; padding:8px 12px; color:#e2e8f0; font-size:0.82rem; width:100%; transition:border-color 0.15s; }
+  .form-input:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 2px #3b82f620; }
+  .form-label { font-size:0.75rem; color:#94a3b8; font-weight:600; margin-bottom:4px; display:block; }
+  .toggle-btn { cursor:pointer; padding:5px 14px; border-radius:6px; font-size:0.75rem; font-weight:600; border:1px solid #334155; background:#0f172a; color:#64748b; transition:all 0.15s; }
+  .toggle-btn.active { border-color:#3b82f6; background:#1e3a5f; color:#60a5fa; }
+  .modal-backdrop { position:fixed; inset:0; background:#00000088; z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal-box { background:#1e293b; border:1px solid #334155; border-radius:16px; max-width:640px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; position:relative; }
+  .alert-critical { background:#1a0808; border:1px solid #991b1b; }
+  .alert-warning  { background:#1c1008; border:1px solid #92400e; }
+  .alert-info     { background:#0c1a2e; border:1px solid #1e40af; }
+  .deal-card { background:#162032; border:1px solid #2d4a6a; border-radius:10px; padding:16px; transition:border-color 0.2s; cursor:pointer; }
+  .deal-card:hover { border-color:#3b82f6; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════════════ -->
+<header class="border-b border-slate-700 px-5 py-3 flex items-center justify-between gap-4 flex-wrap">
+  <div class="flex items-center gap-3 shrink-0">
+    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-sm">VV</div>
+    <div>
+      <div class="font-bold text-white text-sm">Veritus Ventures</div>
+      <div class="text-xs text-slate-500">A2A Marketplace · Indian MSME Platform <span class="text-blue-500 font-semibold">v2.0</span></div>
+    </div>
+  </div>
+  <div id="progress-container" class="hidden flex-1 max-w-sm">
+    <div class="flex justify-between text-xs text-slate-400 mb-1">
+      <span id="progress-label-text">Running…</span>
+      <span id="progress-pct-text">0%</span>
+    </div>
+    <div class="progress-bar"><div id="progress-fill" class="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div class="flex items-center gap-2 shrink-0 flex-wrap">
+    <span id="last-run" class="text-xs text-slate-500">No report yet</span>
+    <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors" id="btn-export">⬇ Export CSV</button>
+    <button onclick="runTest(10,false)" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5" id="btn-1k">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Run ~1K
+    </button>
+    <button onclick="runTest(100,false)" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5" id="btn-10k">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Run ~10K
+    </button>
+    <button onclick="runTest(1,true)" title="Ollama AI mediation (~2 min)" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5" id="btn-llm">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>LLM Demo
+    </button>
+  </div>
+</header>
+
+<!-- ══ NAVIGATION ══════════════════════════════════════════════════════════ -->
+<nav class="px-5 pt-3 pb-1 flex gap-1.5 overflow-x-auto border-b border-slate-800">
+  <div class="tab active" onclick="showTab('overview',this)">📊 Overview</div>
+  <div class="tab" onclick="showTab('moq',this)">📦 MOQ &amp; Waivers</div>
+  <div class="tab" onclick="showTab('failures',this)">❌ Failures</div>
+  <div class="tab" onclick="showTab('agents',this)">🏆 Leaderboard</div>
+  <div class="tab" onclick="showTab('deals',this)">💼 Top Deals</div>
+  <div class="tab" onclick="showTab('trajectories',this)">📈 Trajectories</div>
+  <div class="tab" onclick="showTab('live',this)">🔴 Live Negotiation</div>
+  <div class="tab" onclick="showTab('sentinel',this)" id="tab-sentinel-nav">🛡 Sentinel</div>
+</nav>
+
+<!-- ══ OVERVIEW TAB ════════════════════════════════════════════════════════ -->
+<section id="tab-overview" class="section active px-5 pb-8">
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-3 mb-4">
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Total Negotiations</div><div class="kpi-value text-white" id="kpi-total">—</div><div class="kpi-sub">negotiations run</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Deals Closed</div><div class="kpi-value text-emerald-400" id="kpi-closed">—</div><div class="kpi-sub" id="kpi-success-rate">success rate</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Avg Savings vs Budget</div><div class="kpi-value savings-pos" id="kpi-savings-budget">—</div><div class="kpi-sub">what buyer saves vs max price</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Avg Savings vs List</div><div class="kpi-value" id="kpi-savings-list">—</div><div class="kpi-sub">vs seller's listed price</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Platform Revenue</div><div class="kpi-value text-purple-400" id="kpi-revenue">—</div><div class="kpi-sub">1% fee on closed deals</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Avg Rounds / Deal</div><div class="kpi-value text-yellow-400" id="kpi-rounds">—</div><div class="kpi-sub">of 10 max rounds</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">LLM Tokens Used</div><div class="kpi-value text-sky-400" id="kpi-llm-tokens">—</div><div class="kpi-sub" id="kpi-llm-sub">Ollama qwen2.5</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">MOQ Waivers</div><div class="kpi-value text-violet-400" id="kpi-moq-waivers">—</div><div class="kpi-sub">failures converted → deals</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Volume Discounts</div><div class="kpi-value text-teal-400" id="kpi-vol-discounts">—</div><div class="kpi-sub">auto-applied (2×/5× MOQ)</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Total Deal Value</div><div class="kpi-value text-amber-400" id="kpi-deal-value">—</div><div class="kpi-sub">GMV (INR)</div></div>
+    <div class="card p-4" id="kpi-sentinel-card"><div class="text-xs text-slate-400 mb-1">🛡 Critical Alerts</div><div class="kpi-value text-slate-500" id="kpi-sentinel">—</div><div class="kpi-sub" id="kpi-sentinel-sub">sentinel watchdog</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">BATNA Rejections</div><div class="kpi-value text-cyan-400" id="kpi-batna">—</div><div class="kpi-sub">walked away from bad offers</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Multi-Dim Trades</div><div class="kpi-value text-lime-400" id="kpi-trades">—</div><div class="kpi-sub" id="kpi-trades-sub">delivery + payment trades</div></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <div class="card p-4"><div class="font-semibold text-xs text-slate-300 mb-3">Failure Reasons</div><div class="chart-wrap"><canvas id="chart-failures"></canvas></div></div>
+    <div class="card p-4"><div class="font-semibold text-xs text-slate-300 mb-3">Category Success Rate</div><div class="chart-wrap"><canvas id="chart-categories"></canvas></div></div>
+    <div class="card p-4"><div class="font-semibold text-xs text-slate-300 mb-3">Strategy Win Rate</div><div class="chart-wrap"><canvas id="chart-strategies"></canvas></div></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div class="card p-4"><div class="font-semibold text-xs text-slate-300 mb-3">Round Distribution — When Deals Close</div><div class="chart-wrap"><canvas id="chart-rounds"></canvas></div></div>
+    <div class="card p-4"><div class="font-semibold text-xs text-slate-300 mb-3">Savings Histogram (% buckets)</div><div class="chart-wrap"><canvas id="chart-savings-hist"></canvas></div></div>
+  </div>
+  <div class="card p-3 text-xs text-slate-500 flex gap-5 flex-wrap">
+    <span>Duration: <span class="text-white font-medium" id="meta-duration">—</span></span>
+    <span>Engine: <span class="text-white font-medium" id="meta-engine">—</span></span>
+    <span>LLM: <span class="text-white font-medium" id="meta-llm-model">—</span></span>
+    <span>Buyers/cat: <span class="text-white font-medium" id="meta-buyers">—</span></span>
+    <span>Max rounds: <span class="text-white font-medium" id="meta-max-rounds">—</span></span>
+    <span>Seed: <span class="text-white font-medium" id="meta-seed">—</span></span>
+    <span>Timestamp: <span class="text-white font-medium" id="meta-ts">—</span></span>
+  </div>
+</section>
+
+<!-- ══ MOQ & WAIVERS TAB ═══════════════════════════════════════════════════ -->
+<section id="tab-moq" class="section px-5 pb-8">
+  <h2 class="text-base font-bold mt-4 mb-1 text-white">MOQ &amp; Waiver Analysis</h2>
+  <p class="text-xs text-slate-500 mb-4">MOQ is the #1 failure driver in Indian MSME markets. The waiver system converts near-miss rejections into closed deals.</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">MOQ Hard Failures</div><div class="kpi-value text-red-400" id="moq-hard-failures">—</div><div class="kpi-sub">buyer qty too low to waive</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Waivers Granted</div><div class="kpi-value text-violet-400" id="moq-waivers-granted">—</div><div class="kpi-sub">failures rescued (&gt;55% MOQ)</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Partial Fulfillment</div><div class="kpi-value text-amber-400" id="moq-partial-fills">—</div><div class="kpi-sub">partial stock accepted</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">LLM-Mediated Deals</div><div class="kpi-value text-sky-400" id="moq-llm-mediated">—</div><div class="kpi-sub">Ollama broke the deadlock</div></div>
+  </div>
+  <div class="card p-4 mb-6"><div class="font-semibold text-xs text-slate-300 mb-3">MOQ Waivers by Category</div><div class="chart-wrap" style="height:260px;"><canvas id="chart-moq-cat"></canvas></div></div>
+  <div class="card overflow-hidden"><div class="overflow-x-auto max-h-96 overflow-y-auto"><table>
+    <thead><tr><th>Category</th><th>Total</th><th>Success</th><th>Failed</th><th>Success%</th><th>Avg Savings (Budget)</th><th>Avg Savings (List)</th><th>Avg Rounds</th><th>MOQ Waivers</th><th>LLM Tokens</th></tr></thead>
+    <tbody id="category-table-body"><tr><td colspan="10" class="text-slate-500 text-center py-6">Run stress test to populate.</td></tr></tbody>
+  </table></div></div>
+</section>
+
+<!-- ══ FAILURE ANALYSIS TAB ════════════════════════════════════════════════ -->
+<section id="tab-failures" class="section px-5 pb-8">
+  <h2 class="text-base font-bold mt-4 mb-1 text-white">Failure Analysis — What Goes Wrong &amp; Why</h2>
+  <p class="text-xs text-slate-500 mb-4">Every failed negotiation has a root cause. Fix the top issues to unlock more deals.</p>
+  <div id="failure-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="card p-6 text-slate-500 text-sm">Run stress test to see failure analysis.</div>
+  </div>
+  <h3 class="font-semibold text-sm mb-2 text-slate-200">Close Misses — Deals That Could Have Closed</h3>
+  <p class="text-xs text-slate-500 mb-3">ZOPA existed but ran out of rounds. Adding 2–3 more rounds or switching to Conceder strategy would close these.</p>
+  <div class="card overflow-hidden"><div class="overflow-x-auto max-h-80 overflow-y-auto"><table>
+    <thead><tr><th>Buyer</th><th>Seller</th><th>Category</th><th>Seller Strategy</th><th>Price Gap</th><th>Rounds Used</th><th>Suggested Fix</th></tr></thead>
+    <tbody id="close-misses-body"><tr><td colspan="7" class="text-slate-500 text-center py-6">No data yet.</td></tr></tbody>
+  </table></div></div>
+</section>
+
+<!-- ══ AGENT LEADERBOARD TAB ═══════════════════════════════════════════════ -->
+<section id="tab-agents" class="section px-5 pb-8">
+  <h2 class="text-base font-bold mt-4 mb-1 text-white">Agent Leaderboard — Seller Performance</h2>
+  <p class="text-xs text-slate-500 mb-3">Which sellers close the most deals? Which strategies win?</p>
+
+  <!-- Add Test Seller collapsible panel -->
+  <div class="card p-4 mb-4">
+    <div class="flex items-center justify-between cursor-pointer" onclick="toggleAddSeller()">
+      <div class="font-semibold text-sm text-slate-200">➕ Add Test Seller to Pool</div>
+      <div id="add-seller-chevron" class="text-slate-500 text-xs">▼ Show</div>
+    </div>
+    <div id="add-seller-form" class="hidden mt-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div><label class="form-label">Seller Name</label><input id="ts-name" type="text" class="form-input" placeholder="Sharma Traders"></div>
+        <div><label class="form-label">Category</label>
+          <select id="ts-category" class="form-input">
+            <option value="steel_raw">Steel Raw</option><option value="fabric_textile">Fabric Textile</option>
+            <option value="plastic_granules">Plastic Granules</option><option value="leather_goods">Leather Goods</option>
+            <option value="agricultural_equipment">Agricultural Equipment</option><option value="packaging_material">Packaging Material</option>
+            <option value="auto_parts">Auto Parts</option><option value="chemical_industrial">Chemical Industrial</option>
+            <option value="ceramic_tiles">Ceramic Tiles</option><option value="electronic_components">Electronic Components</option>
+          </select>
+        </div>
+        <div><label class="form-label">Floor Price (₹/unit)</label><input id="ts-floor" type="number" class="form-input" placeholder="800" min="1"></div>
+        <div><label class="form-label">List Price (₹/unit)</label><input id="ts-list" type="number" class="form-input" placeholder="1000" min="1"></div>
+        <div><label class="form-label">MOQ (units)</label><input id="ts-moq" type="number" class="form-input" placeholder="500" min="1"></div>
+        <div><label class="form-label">Quality Grade</label>
+          <select id="ts-quality" class="form-input"><option value="A">Grade A (Premium)</option><option value="B" selected>Grade B (Standard)</option><option value="C">Grade C (Economy)</option></select>
+        </div>
+        <div><label class="form-label">Strategy</label>
+          <select id="ts-strategy" class="form-input">
+            <option value="boulware">Boulware</option><option value="conceder" selected>Conceder</option>
+            <option value="tit_for_tat">Tit-for-Tat</option><option value="hardball">Hardball</option>
+            <option value="aspirational">Aspirational</option><option value="realistic">Realistic</option>
+          </select>
+        </div>
+        <div class="flex items-end"><button onclick="addTestSeller()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-lg w-full">Add to Pool</button></div>
+      </div>
+      <div id="test-sellers-list" class="mt-3 text-xs text-slate-500"></div>
+    </div>
+  </div>
+
+  <div class="flex gap-2 mb-3 flex-wrap">
+    <select id="filter-strategy" onchange="renderLeaderboard()" class="bg-slate-800 border border-slate-600 text-xs text-white rounded-lg px-2.5 py-1.5">
+      <option value="">All Strategies</option><option value="boulware">Boulware</option><option value="conceder">Conceder</option>
+      <option value="tit_for_tat">Tit-for-Tat</option><option value="hardball">Hardball</option>
+      <option value="aspirational">Aspirational</option><option value="realistic">Realistic</option>
+    </select>
+    <select id="filter-category" onchange="renderLeaderboard()" class="bg-slate-800 border border-slate-600 text-xs text-white rounded-lg px-2.5 py-1.5"><option value="">All Categories</option></select>
+    <select id="sort-by" onchange="renderLeaderboard()" class="bg-slate-800 border border-slate-600 text-xs text-white rounded-lg px-2.5 py-1.5">
+      <option value="success_pct">Sort: Success Rate</option><option value="closed">Sort: Deals Closed</option><option value="avg_savings_pct">Sort: Avg Savings</option>
+    </select>
+  </div>
+  <div class="card overflow-hidden"><div class="overflow-x-auto max-h-screen overflow-y-auto"><table>
+    <thead><tr><th>#</th><th>Seller</th><th>Strategy</th><th>Category</th><th>Queried</th><th>Closed</th><th>Success%</th><th>Avg Savings</th><th>Top Failure</th></tr></thead>
+    <tbody id="leaderboard-body"><tr><td colspan="9" class="text-slate-500 text-center py-6">Run stress test to populate.</td></tr></tbody>
+  </table></div></div>
+</section>
+
+<!-- ══ TOP DEALS TAB ═══════════════════════════════════════════════════════ -->
+<section id="tab-deals" class="section px-5 pb-8">
+  <h2 class="text-base font-bold mt-4 mb-1 text-white">Top Deals</h2>
+  <p class="text-xs text-slate-500 mb-3">Ranked by MCDA: Price 40% · Delivery 30% · Quality 20% · Reputation 5% · Payment 5%. Click any row for details.</p>
+  <div class="flex flex-wrap gap-2 mb-3">
+    <input id="deals-search" type="text" placeholder="Search seller or category…" class="form-input" style="max-width:220px;" oninput="renderTopDeals()">
+    <div class="flex items-center gap-2">
+      <label class="text-xs text-slate-400">Min savings:</label>
+      <input id="deals-min-savings" type="range" min="-50" max="50" value="-50" step="5" class="w-24" oninput="document.getElementById('deals-savings-val').textContent=this.value+'%';renderTopDeals()">
+      <span id="deals-savings-val" class="text-xs text-slate-300 w-10">-50%</span>
+    </div>
+    <label class="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer">
+      <input id="deals-hide-flagged" type="checkbox" onchange="renderTopDeals()"> Hide ⚠ flagged
+    </label>
+  </div>
+  <div class="card overflow-hidden"><div class="overflow-x-auto max-h-screen overflow-y-auto"><table>
+    <thead><tr><th>#</th><th>Seller</th><th>Category</th><th>Final Price</th><th>Qty</th><th>Quality</th><th>Delivery</th><th>Payment</th><th>Rounds</th><th>Savings%</th><th>Score</th><th>Tags</th></tr></thead>
+    <tbody id="top-deals-body"><tr><td colspan="12" class="text-slate-500 text-center py-6">Run stress test to populate.</td></tr></tbody>
+  </table></div></div>
+  <p class="text-xs text-slate-600 mt-2">⚠ Orange rows = Sentinel-flagged anomalies. Click any row to view deal details.</p>
+</section>
+
+<!-- ══ OFFER TRAJECTORIES TAB ══════════════════════════════════════════════ -->
+<section id="tab-trajectories" class="section px-5 pb-8">
+  <h2 class="text-base font-bold mt-4 mb-1 text-white">Offer Trajectories</h2>
+  <p class="text-xs text-slate-500 mb-4">The actual back-and-forth price offers. <span class="text-blue-400">Blue = buyer</span>, <span class="text-green-400">Green = seller</span>.</p>
+  <div id="trajectory-cards" class="space-y-3">
+    <div class="card p-6 text-slate-500 text-sm">Run stress test to see offer trajectories.</div>
+  </div>
+</section>
+
+<!-- ══ LIVE NEGOTIATION TAB ═══════════════════════════════════════════════ -->
+<section id="tab-live" class="section px-5 pb-8">
+  <h2 class="text-base font-bold mt-4 mb-1 text-white">🔴 Live Negotiation</h2>
+  <p class="text-xs text-slate-500 mb-4">Enter your requirements. The buyer agent negotiates with all available sellers in real-time and returns the top 10 shortlist.</p>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Form panel -->
+    <div class="lg:col-span-1">
+      <div class="card p-5 space-y-4">
+        <h3 class="font-semibold text-sm text-white">Buyer Requirements</h3>
+        <div><label class="form-label">Company Name (optional)</label><input id="live-name" type="text" class="form-input" placeholder="e.g. Patel Industries"></div>
+        <div><label class="form-label">Product Category *</label>
+          <select id="live-category" class="form-input">
+            <option value="">— Select category —</option>
+            <option value="steel_raw">Steel Raw</option><option value="fabric_textile">Fabric Textile</option>
+            <option value="plastic_granules">Plastic Granules</option><option value="leather_goods">Leather Goods</option>
+            <option value="agricultural_equipment">Agricultural Equipment</option><option value="packaging_material">Packaging Material</option>
+            <option value="auto_parts">Auto Parts</option><option value="chemical_industrial">Chemical Industrial</option>
+            <option value="ceramic_tiles">Ceramic Tiles</option><option value="electronic_components">Electronic Components</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="form-label">Quantity (units) *</label><input id="live-qty" type="number" class="form-input" placeholder="500" min="1" max="100000"></div>
+          <div><label class="form-label">Location State</label>
+            <select id="live-state" class="form-input">
+              <option>Maharashtra</option><option>Gujarat</option><option>Karnataka</option><option>Tamil Nadu</option>
+              <option>Rajasthan</option><option>Uttar Pradesh</option><option>Punjab</option><option>Haryana</option>
+              <option>West Bengal</option><option>Telangana</option><option>Andhra Pradesh</option>
+              <option>Madhya Pradesh</option><option>Delhi</option><option>Odisha</option><option>Kerala</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="form-label">Target Price ₹/unit *</label><input id="live-target" type="number" class="form-input" placeholder="850" min="1"></div>
+          <div><label class="form-label">Max Price ₹/unit *</label><input id="live-max" type="number" class="form-input" placeholder="1000" min="1"></div>
+        </div>
+        <div>
+          <label class="form-label">Minimum Quality Grade</label>
+          <div class="flex gap-2 mt-1">
+            <button class="toggle-btn" id="qual-C" onclick="setQuality('C')">C – Economy</button>
+            <button class="toggle-btn active" id="qual-B" onclick="setQuality('B')">B – Standard</button>
+            <button class="toggle-btn" id="qual-A" onclick="setQuality('A')">A – Premium</button>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Deadline: <span id="live-deadline-val" class="text-white">30</span> days</label>
+          <input id="live-deadline" type="range" min="1" max="90" value="30" class="w-full" oninput="document.getElementById('live-deadline-val').textContent=this.value">
+        </div>
+        <div><label class="form-label">Payment Preference</label>
+          <select id="live-payment" class="form-input">
+            <option value="net_60">Net 60 (best for you)</option><option value="net_30" selected>Net 30</option>
+            <option value="net_15">Net 15</option><option value="advance_50">50% Advance</option><option value="advance_100">100% Advance</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Urgency Level</label>
+          <div class="flex gap-2 mt-1 flex-wrap">
+            <button class="toggle-btn" id="urg-low" onclick="setUrgency('low')">🐢 Low</button>
+            <button class="toggle-btn active" id="urg-normal" onclick="setUrgency('normal')">⚡ Normal</button>
+            <button class="toggle-btn" id="urg-high" onclick="setUrgency('high')">🔥 High</button>
+            <button class="toggle-btn" id="urg-urgent" onclick="setUrgency('urgent')">🚨 Urgent</button>
+          </div>
+        </div>
+        <button onclick="runLiveNegotiation()" id="btn-live" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>Find Best Sellers
+        </button>
+        <div id="live-error" class="text-xs text-red-400 hidden"></div>
+      </div>
+    </div>
+    <!-- Results panel -->
+    <div class="lg:col-span-2">
+      <div id="live-placeholder" class="card p-8 text-center text-slate-500">
+        <div class="text-4xl mb-3">🤝</div>
+        <div class="font-semibold text-slate-400 mb-1">Ready to Negotiate</div>
+        <div class="text-xs">Fill in your requirements and click "Find Best Sellers" to run a live negotiation across all available sellers in the selected category.</div>
+      </div>
+      <div id="live-loading" class="hidden card p-8 text-center">
+        <div class="spinner inline-block w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mb-3"></div>
+        <div class="text-slate-400 text-sm">Negotiating with sellers…</div>
+        <div class="text-slate-500 text-xs mt-1">Running parallel negotiations with two-pass BATNA</div>
+      </div>
+      <div id="live-results" class="hidden space-y-3">
+        <div class="flex items-center justify-between mb-2">
+          <div class="font-semibold text-white text-sm" id="live-results-title">Top Deals Found</div>
+          <div class="text-xs text-slate-400" id="live-results-meta"></div>
+        </div>
+        <div id="live-deal-cards"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SENTINEL ALERTS TAB ═════════════════════════════════════════════════ -->
+<section id="tab-sentinel" class="section px-5 pb-8">
+  <h2 class="text-base font-bold mt-4 mb-1 text-white">🛡 Sentinel Watchdog Alerts</h2>
+  <p class="text-xs text-slate-500 mb-4">The Sentinel Agent monitors every negotiation for anomalies — price manipulation, injection attempts, statistical outliers, and protocol issues.</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div class="card alert-critical p-4"><div class="text-xs text-red-400 mb-1">🔴 Critical</div><div class="kpi-value text-red-300" id="sent-critical">—</div><div class="kpi-sub" style="color:#7f1d1d;">price, injection, zero-price</div></div>
+    <div class="card alert-warning p-4"><div class="text-xs text-yellow-400 mb-1">🟡 Warnings</div><div class="kpi-value text-yellow-300" id="sent-warnings">—</div><div class="kpi-sub" style="color:#78350f;">exhaustion, LLM issues</div></div>
+    <div class="card alert-info p-4"><div class="text-xs text-blue-400 mb-1">🔵 Info</div><div class="kpi-value text-blue-300" id="sent-info">—</div><div class="kpi-sub" style="color:#1e3a5f;">statistical outliers</div></div>
+    <div class="card p-4"><div class="text-xs text-slate-400 mb-1">Sessions Monitored</div><div class="kpi-value text-slate-300" id="sent-sessions">—</div><div class="kpi-sub">negotiations watched</div></div>
+  </div>
+  <div class="card p-4 mb-6" id="sent-by-category-card" style="display:none;">
+    <div class="font-semibold text-xs text-slate-300 mb-3">Alerts by Category</div>
+    <div id="sent-by-category" class="flex flex-wrap gap-2"></div>
+  </div>
+  <div class="card overflow-hidden"><div class="overflow-x-auto max-h-screen overflow-y-auto"><table>
+    <thead><tr><th>Severity</th><th>Category</th><th>Alert ID</th><th>Session</th><th>Message</th></tr></thead>
+    <tbody id="sentinel-alerts-body"><tr><td colspan="5" class="text-slate-500 text-center py-6">Run stress test to populate sentinel data.</td></tr></tbody>
+  </table></div></div>
+</section>
+
+<!-- ══ DEAL DRILL-DOWN MODAL ═══════════════════════════════════════════════ -->
+<div id="deal-modal" class="modal-backdrop hidden" onclick="if(event.target===this)closeDealModal()">
+  <div class="modal-box">
+    <button onclick="closeDealModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl leading-none">✕</button>
+    <h3 class="font-bold text-white text-base mb-1 pr-8" id="modal-title">Deal Details</h3>
+    <div class="text-xs text-slate-500 mb-4" id="modal-subtitle"></div>
+    <div class="grid grid-cols-3 gap-3 mb-4" id="modal-metrics"></div>
+    <div class="mb-4" id="modal-narrative"></div>
+    <div class="mb-4">
+      <div class="text-xs text-slate-400 font-semibold mb-2">Offer Trajectory</div>
+      <div id="modal-trajectory" class="trajectory"></div>
+    </div>
+    <div id="modal-flags" class="flex flex-wrap gap-2"></div>
+  </div>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let report = null;
+let charts = {};
+let sseSource = null;
+let running = false;
+let _liveQuality = 'B';
+let _liveUrgency = 'normal';
+let _testSellers = [];
+
+// ── Tab navigation ─────────────────────────────────────────────────────────────
+function showTab(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function fmtINR(v) {
+  if (v == null || isNaN(v)) return '—';
+  if (v >= 1e7) return 'Rs.' + (v/1e7).toFixed(2) + 'Cr';
+  if (v >= 1e5) return 'Rs.' + (v/1e5).toFixed(1) + 'L';
+  return 'Rs.' + Math.round(v).toLocaleString('en-IN');
+}
+function fmtPct(v, d=1) {
+  if (v == null || isNaN(v)) return '—';
+  return (v > 0 ? '+' : '') + parseFloat(v).toFixed(d) + '%';
+}
+function savingsClass(v) {
+  if (v == null) return 'savings-zero';
+  return v > 0.5 ? 'savings-pos' : v < -0.5 ? 'savings-neg' : 'savings-zero';
+}
+function stratBadge(s) {
+  return {boulware:'badge-red',conceder:'badge-green',tit_for_tat:'badge-blue',hardball:'badge-yellow',aspirational:'badge-purple',realistic:'badge-blue'}[s] || 'badge-blue';
+}
+function qualBadge(g) { return g==='A'?'badge-green':g==='B'?'badge-blue':'badge-yellow'; }
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); charts[id]=null; } }
+
+const FAILURE_LABELS = {
+  price_floor_above_buyer_max:'Price Too High',moq_not_met:'MOQ Too High',
+  payment_term_mismatch:'Payment Clash',quality_below_minimum:'Quality Mismatch',
+  insufficient_stock:'Out of Stock',max_rounds_no_deal:'Deadlock (rounds)',
+  negotiation_timeout:'Timeout',seller_blacklisted:'Blacklisted',
+  seller_offline:'Seller Offline',no_zopa:'No ZOPA',batna_rejected:'BATNA Rejected',
+};
+const FAILURE_DESC = {
+  price_floor_above_buyer_max:"Seller's floor price exceeds buyer's maximum budget — no deal is mathematically possible.",
+  moq_not_met:"Buyer's quantity is too far below seller's MOQ, even with waiver (< 55% of MOQ).",
+  payment_term_mismatch:"Seller cannot accept buyer's preferred payment terms.",
+  quality_below_minimum:"Seller's quality grade is below buyer's minimum requirement.",
+  insufficient_stock:"Seller lacks sufficient available stock to fulfill the order.",
+  max_rounds_no_deal:"Both parties were within striking distance but couldn't bridge the gap in allowed rounds.",
+  negotiation_timeout:"Negotiation exceeded the time limit.",
+  seller_blacklisted:"Buyer has blacklisted this seller from previous dealings.",
+  seller_offline:"Seller marked as offline / not accepting orders.",
+  no_zopa:"Zero Overlap — floor price above max price even at best terms.",
+  batna_rejected:"Buyer walked away — seller offer was worse than BATNA by >5%.",
+};
+const FAILURE_FIX = {
+  price_floor_above_buyer_max:'Increase buyer budget, or relax quality/certification requirements to find cheaper sellers.',
+  moq_not_met:'Allow partial fulfillment, or aggregate demand from multiple buyers to meet MOQ.',
+  payment_term_mismatch:'Enable payment term upgrade in protocol.',
+  quality_below_minimum:'Lower quality minimum requirement, or expand seller pool.',
+  insufficient_stock:'Enable partial fulfillment, or route to secondary sellers.',
+  max_rounds_no_deal:'Increase max_rounds from 10 → 15, or switch seller strategy to Conceder.',
+  negotiation_timeout:'Reduce LLM calls or use a faster model. Falls back to ZOPA midpoint.',
+  seller_blacklisted:'Review blacklist policy — allow whitelisting after dispute resolution.',
+  seller_offline:'Improve seller onboarding: notify sellers of pending buyer queries.',
+  no_zopa:"Widen buyer's max_price or expand seller pool to lower floor-price suppliers.",
+  batna_rejected:'Seller needs to be more competitive. Check pricing strategy.',
+};
+
+// ── Load & render ─────────────────────────────────────────────────────────────
+async function loadReport() {
+  try {
+    const r = await fetch('/api/stats/latest-report');
+    if (!r.ok) return;
+    report = await r.json();
+    renderAll();
+  } catch(e) { console.warn('No report:', e.message); }
+}
+function renderAll() {
+  if (!report) return;
+  renderKPIs(); renderMeta(); renderCharts();
+  renderMOQTab(); renderFailureCards(); renderCloseMisses();
+  renderLeaderboard(); renderTopDeals(); renderTrajectories();
+  renderSentinelTab(); populateCategoryFilter();
+}
+
+// ── KPI Cards ─────────────────────────────────────────────────────────────────
+function renderKPIs() {
+  const s = report.summary || {};
+  const m = report.meta || {};
+  document.getElementById('kpi-total').textContent = (s.total_negotiations||0).toLocaleString();
+  document.getElementById('kpi-closed').textContent = (s.deals_closed||0).toLocaleString();
+  document.getElementById('kpi-success-rate').textContent = (s.success_rate_pct||0) + '% success rate';
+  const elB = document.getElementById('kpi-savings-budget');
+  elB.textContent = fmtPct(s.avg_buyer_savings_pct);
+  elB.className = 'kpi-value ' + savingsClass(s.avg_buyer_savings_pct);
+  const elL = document.getElementById('kpi-savings-list');
+  elL.textContent = fmtPct(s.avg_vs_list_pct);
+  elL.className = 'kpi-value ' + savingsClass(s.avg_vs_list_pct);
+  document.getElementById('kpi-revenue').textContent = fmtINR(s.platform_fee_inr);
+  document.getElementById('kpi-rounds').textContent = (s.avg_rounds_per_deal||0).toFixed(1);
+  const tokens = s.total_llm_tokens || 0;
+  document.getElementById('kpi-llm-tokens').textContent = tokens > 1000 ? (tokens/1000).toFixed(1)+'K' : tokens.toLocaleString();
+  document.getElementById('kpi-llm-sub').textContent = tokens > 0 ? `~${(tokens*0.000002).toFixed(4)} USD (Ollama ≈$0)` : 'No LLM calls (disabled)';
+  document.getElementById('kpi-moq-waivers').textContent = (s.moq_waivers_granted||0).toLocaleString();
+  document.getElementById('kpi-vol-discounts').textContent = (s.volume_discounts_applied||0).toLocaleString();
+  document.getElementById('kpi-deal-value').textContent = fmtINR(s.total_deal_value_inr);
+  document.getElementById('last-run').textContent = 'Last: ' + (m.timestamp||'').replace('_',' ').slice(0,-2);
+  // v3 KPIs
+  const sent = report.sentinel || {};
+  const crit = sent.critical || 0;
+  const sentEl = document.getElementById('kpi-sentinel');
+  sentEl.textContent = crit;
+  sentEl.className = 'kpi-value ' + (crit === 0 ? 'text-emerald-400' : 'text-red-400');
+  document.getElementById('kpi-sentinel-sub').textContent = crit === 0 ? '✅ All clear' : `⚠ ${crit} critical alerts`;
+  document.getElementById('kpi-sentinel-card').style.borderColor = crit > 0 ? '#991b1b' : '#166534';
+  document.getElementById('kpi-batna').textContent = (s.batna_rejections||0).toLocaleString();
+  const trades = (s.delivery_trades||0) + (s.payment_trades||0);
+  document.getElementById('kpi-trades').textContent = trades.toLocaleString();
+  document.getElementById('kpi-trades-sub').textContent = `${s.delivery_trades||0} delivery · ${s.payment_trades||0} payment`;
+}
+function renderMeta() {
+  const m = report.meta || {};
+  document.getElementById('meta-duration').textContent = (m.duration_secs||0).toFixed(2) + 's';
+  document.getElementById('meta-engine').textContent = m.engine || '—';
+  document.getElementById('meta-llm-model').textContent = m.llm_model || 'disabled';
+  document.getElementById('meta-buyers').textContent = m.buyers_per_category || '—';
+  document.getElementById('meta-max-rounds').textContent = m.max_rounds || '—';
+  document.getElementById('meta-seed').textContent = m.seed || '—';
+  document.getElementById('meta-ts').textContent = m.timestamp || '—';
+}
+
+// ── Charts ─────────────────────────────────────────────────────────────────────
+function renderCharts() {
+  renderFailureDonut(); renderCategoryBar(); renderStrategyBar();
+  renderRoundDistribution(); renderSavingsHistogram();
+}
+function renderFailureDonut() {
+  destroyChart('failures');
+  const raw = report.by_failure_reason;
+  let items = Array.isArray(raw) ? raw : raw && typeof raw==='object'
+    ? Object.entries(raw).map(([k,v])=>({reason:k,count:v.count||v,label:v.label||FAILURE_LABELS[k]||k})) : [];
+  if (!items.length) {
+    const ctx = document.getElementById('chart-failures').getContext('2d');
+    charts['failures'] = new Chart(ctx,{type:'doughnut',data:{labels:['All Deals Closed!'],datasets:[{data:[1],backgroundColor:['#4ade80'],borderWidth:0}]},options:{cutout:'65%',plugins:{legend:{labels:{color:'#4ade80',font:{size:11}}}}}});
+    return;
+  }
+  const sorted = items.slice().sort((a,b)=>(b.count||0)-(a.count||0));
+  const colors = ['#f87171','#fbbf24','#a78bfa','#34d399','#60a5fa','#fb923c','#e879f9','#94a3b8'];
+  const ctx = document.getElementById('chart-failures').getContext('2d');
+  charts['failures'] = new Chart(ctx,{type:'doughnut',data:{labels:sorted.map(d=>d.label||FAILURE_LABELS[d.reason]||d.reason),datasets:[{data:sorted.map(d=>d.count||0),backgroundColor:colors.slice(0,sorted.length),borderWidth:2,borderColor:'#1e293b'}]},options:{cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:9},padding:6,boxWidth:8}}}}});
+}
+function renderCategoryBar() {
+  destroyChart('categories');
+  const data = report.by_category || {};
+  const keys = Object.keys(data).filter(k=>data[k].total>0);
+  if (!keys.length) return;
+  const labels = keys.map(k=>k.replace(/_/g,' ').split(' ').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ').substring(0,14));
+  const rates = keys.map(k=>data[k].success_pct||0);
+  const ctx = document.getElementById('chart-categories').getContext('2d');
+  charts['categories'] = new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Success %',data:rates,backgroundColor:rates.map(r=>r>70?'#4ade80':r>40?'#fbbf24':'#f87171'),borderRadius:4}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{max:100,ticks:{color:'#64748b',font:{size:9},callback:v=>v+'%'},grid:{color:'#1e293b44'}},y:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}}}}});
+}
+function renderStrategyBar() {
+  destroyChart('strategies');
+  const data = report.by_strategy || {};
+  const keys = Object.keys(data).filter(k=>data[k].total>0);
+  if (!keys.length) return;
+  const labels = keys.map(k=>k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()));
+  const rates = keys.map(k=>data[k].success_pct||data[k].success_rate_pct||0);
+  const rounds = keys.map(k=>data[k].avg_rounds||0);
+  const ctx = document.getElementById('chart-strategies').getContext('2d');
+  charts['strategies'] = new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Success %',data:rates,backgroundColor:'#3b82f6',borderRadius:4,yAxisID:'y'},{label:'Avg Rounds',data:rounds,backgroundColor:'#8b5cf6aa',borderRadius:4,yAxisID:'y2'}]},options:{plugins:{legend:{labels:{color:'#94a3b8',font:{size:9}}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#1e293b44'}},y:{max:100,ticks:{color:'#64748b',font:{size:9},callback:v=>v+'%'},grid:{color:'#1e293b44'}},y2:{position:'right',max:12,ticks:{color:'#8b5cf6',font:{size:9}},grid:{display:false}}}}});
+}
+function renderRoundDistribution() {
+  destroyChart('rounds');
+  const data = report.round_distribution || {};
+  const allR = Array.from({length:10},(_,i)=>String(i+1));
+  const counts = allR.map(r=>data[r]||0);
+  if (!counts.some(v=>v>0)) return;
+  const ctx = document.getElementById('chart-rounds').getContext('2d');
+  charts['rounds'] = new Chart(ctx,{type:'bar',data:{labels:allR.map(r=>'Rd '+r),datasets:[{label:'Deals closed',data:counts,backgroundColor:allR.map(r=>parseInt(r)<=3?'#4ade80':parseInt(r)<=7?'#fbbf24':'#f87171'),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'#1e293b44'}}}}});
+}
+function renderSavingsHistogram() {
+  destroyChart('savings-hist');
+  const data = report.savings_histogram || {};
+  const keys = Object.keys(data).map(Number).sort((a,b)=>a-b);
+  if (!keys.length) return;
+  const ctx = document.getElementById('chart-savings-hist').getContext('2d');
+  charts['savings-hist'] = new Chart(ctx,{type:'bar',data:{labels:keys.map(k=>k+'–'+(k+5)+'%'),datasets:[{label:'Deals',data:keys.map(k=>data[String(k)]||0),backgroundColor:keys.map(k=>k>=10?'#4ade80':k>=5?'#a3e635':k>=0?'#fbbf24':'#f87171'),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'#1e293b44'}}}}});
+}
+
+// ── MOQ Tab ───────────────────────────────────────────────────────────────────
+function renderMOQTab() {
+  const ma = report.moq_analysis || {};
+  const s  = report.summary || {};
+  document.getElementById('moq-hard-failures').textContent  = (ma.total_moq_failures||0).toLocaleString();
+  document.getElementById('moq-waivers-granted').textContent = (ma.moq_waivers_granted||s.moq_waivers_granted||0).toLocaleString();
+  document.getElementById('moq-partial-fills').textContent   = (ma.partial_fulfillment_deals||s.partial_fulfillment_deals||0).toLocaleString();
+  document.getElementById('moq-llm-mediated').textContent    = (s.llm_assisted_deals||0).toLocaleString();
+  destroyChart('moq-cat');
+  const catData = report.by_category || {};
+  const cats = Object.keys(catData).filter(k=>catData[k].total>0);
+  if (cats.length) {
+    const ctx = document.getElementById('chart-moq-cat').getContext('2d');
+    charts['moq-cat'] = new Chart(ctx,{type:'bar',data:{labels:cats.map(k=>k.replace(/_/g,' ').substring(0,16)),datasets:[{label:'MOQ Waivers Granted',data:cats.map(k=>catData[k].moq_waivers||0),backgroundColor:'#7c3aed',borderRadius:4,stack:'a'},{label:'Hard MOQ Failures',data:cats.map(k=>catData[k].failed||0),backgroundColor:'#991b1b',borderRadius:4,stack:'a'}]},options:{indexAxis:'y',plugins:{legend:{labels:{color:'#94a3b8',font:{size:9}}}},scales:{x:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'#1e293b44'},stacked:true},y:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false},stacked:true}}}});
+  }
+  const tbody = document.getElementById('category-table-body');
+  const allCats = Object.keys(catData);
+  if (!allCats.length) return;
+  tbody.innerHTML = allCats.map(cat => {
+    const d = catData[cat];
+    return `<tr>
+      <td class="text-white font-medium">${cat.replace(/_/g,' ')}</td>
+      <td class="text-slate-400">${d.total||0}</td><td class="text-emerald-400">${d.success||0}</td><td class="text-red-400">${d.failed||0}</td>
+      <td class="${d.success_pct>70?'text-emerald-400':d.success_pct>40?'text-yellow-400':'text-red-400'}">${(d.success_pct||0).toFixed(1)}%</td>
+      <td class="${savingsClass(d.avg_savings_pct)}">${fmtPct(d.avg_savings_pct)}</td>
+      <td class="${savingsClass(d.avg_vs_list_pct)}">${fmtPct(d.avg_vs_list_pct)}</td>
+      <td class="text-yellow-400">${(d.avg_rounds||0).toFixed(1)}</td>
+      <td class="text-violet-400">${d.moq_waivers||0}</td><td class="text-sky-400">${d.llm_tokens||0}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Failure Cards ──────────────────────────────────────────────────────────────
+function renderFailureCards() {
+  const container = document.getElementById('failure-cards');
+  const raw = report.by_failure_reason;
+  let items = Array.isArray(raw) ? raw : raw && typeof raw==='object'
+    ? Object.entries(raw).map(([k,v])=>({reason:k,count:typeof v==='number'?v:v.count||0,label:v.label||FAILURE_LABELS[k]||k,pct:v.pct||0,examples:v.examples||[]})) : [];
+  if (!items.length) { container.innerHTML='<div class="card p-6 text-emerald-400 font-semibold">🎉 100% deal close rate — no failures!</div>'; return; }
+  const total = items.reduce((s,i)=>s+(i.count||0),0);
+  const sorted = items.slice().sort((a,b)=>(b.count||0)-(a.count||0));
+  container.innerHTML = sorted.map(d => {
+    const pct = total ? ((d.count/total)*100).toFixed(1) : (d.pct||0);
+    const reason = d.reason || '';
+    return `<div class="card p-5">
+      <div class="flex items-start justify-between mb-2">
+        <div class="font-semibold text-sm text-white">${d.label||FAILURE_LABELS[reason]||reason}</div>
+        <div class="flex gap-2"><span class="badge badge-red">${(d.count||0).toLocaleString()} failures</span><span class="badge badge-yellow">${pct}%</span></div>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">${FAILURE_DESC[reason]||'See negotiation logs for details.'}</p>
+      <div class="bg-slate-900 rounded-lg px-3 py-2 text-xs"><span class="text-blue-400 font-semibold">Fix: </span><span class="text-slate-300">${FAILURE_FIX[reason]||'Tune constraints and retry.'}</span></div>
+      ${(d.examples&&d.examples.length)?`<div class="mt-3 text-xs text-slate-500 border-t border-slate-700 pt-2"><div class="font-semibold mb-1 text-slate-400">Sample cases:</div>${d.examples.slice(0,3).map(e=>`<div class="flex gap-3 py-1 border-b border-slate-800 flex-wrap"><span class="text-white">${e.seller_name||'—'}</span><span class="text-slate-500">${(e.category||'').replace(/_/g,' ')}</span>${e.price_gap_pct!=null?`<span class="${e.price_gap_pct<0?'text-red-400':'text-yellow-400'}">Gap ${e.price_gap_pct}%</span>`:''}<span class="text-purple-300">${e.seller_strategy||'—'}</span></div>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── Close Misses ───────────────────────────────────────────────────────────────
+function renderCloseMisses() {
+  const tbody = document.getElementById('close-misses-body');
+  const misses = report.close_misses || report.notable_failures || [];
+  if (!misses.length) { tbody.innerHTML='<tr><td colspan="7" class="text-emerald-400 text-center py-4 text-sm">No close misses! All ZOPA sessions resolved.</td></tr>'; return; }
+  tbody.innerHTML = misses.slice(0,20).map(m=>`<tr>
+    <td class="text-blue-300 text-xs">${m.buyer_id||'—'}</td><td class="text-white">${m.seller_name||m.seller_id||'—'}</td>
+    <td class="text-slate-400 text-xs">${(m.category||'').replace(/_/g,' ')}</td>
+    <td><span class="badge ${stratBadge(m.seller_strategy)}">${m.seller_strategy||'—'}</span></td>
+    <td class="${(m.price_gap_pct||0)>0?'text-yellow-400':'text-red-400'}">${m.price_gap_pct||'—'}%</td>
+    <td class="text-slate-400">${m.offer_trajectory?m.offer_trajectory.length:m.rounds||'—'}</td>
+    <td class="text-blue-400 text-xs">↑ rounds or → Conceder</td>
+  </tr>`).join('');
+}
+
+// ── Agent Leaderboard ──────────────────────────────────────────────────────────
+function populateCategoryFilter() {
+  const catFilter = document.getElementById('filter-category');
+  if (catFilter.options.length > 1) return;
+  Object.keys(report.by_category||{}).forEach(cat => {
+    const o = document.createElement('option');
+    o.value = cat; o.textContent = cat.replace(/_/g,' ');
+    catFilter.appendChild(o);
+  });
+}
+function renderLeaderboard() {
+  if (!report) return;
+  const stratF = document.getElementById('filter-strategy').value;
+  const catF   = document.getElementById('filter-category').value;
+  const sortBy = document.getElementById('sort-by').value;
+  let data = [...(report.agent_leaderboard||[])];
+  if (stratF) data = data.filter(d=>d.strategy===stratF);
+  if (catF)   data = data.filter(d=>d.category===catF);
+  data.sort((a,b)=>(b[sortBy]||0)-(a[sortBy]||0));
+  const tbody = document.getElementById('leaderboard-body');
+  if (!data.length) { tbody.innerHTML='<tr><td colspan="9" class="text-slate-500 text-center py-6">No matching agents.</td></tr>'; return; }
+  tbody.innerHTML = data.slice(0,60).map((a,i) => {
+    const sp = a.success_pct||a.success_rate_pct||0;
+    const spClass = sp>70?'text-emerald-400':sp>40?'text-yellow-400':'text-red-400';
+    const spBarColor = sp>70?'bg-emerald-400':sp>40?'bg-yellow-400':'bg-red-400';
+    return `<tr>
+      <td class="text-slate-500 text-xs">${i+1}</td><td class="text-white font-medium text-xs">${a.name||a.seller_name||'—'}</td>
+      <td><span class="badge ${stratBadge(a.strategy)}">${a.strategy||'—'}</span></td>
+      <td class="text-slate-400 text-xs">${(a.category||'').replace(/_/g,' ')}</td>
+      <td class="text-slate-400">${a.queried||0}</td><td class="text-emerald-400">${a.closed||0}</td>
+      <td><div class="flex items-center gap-2"><div class="w-14 h-1.5 bg-slate-700 rounded-full overflow-hidden"><div class="h-full rounded-full ${spBarColor}" style="width:${sp}%"></div></div><span class="${spClass} text-xs">${sp.toFixed(1)}%</span></div></td>
+      <td class="${savingsClass(a.avg_savings_pct)} text-xs">${fmtPct(a.avg_savings_pct)}</td>
+      <td class="text-red-300 text-xs">${a.top_failure?(FAILURE_LABELS[a.top_failure]||a.top_failure):'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Top Deals ──────────────────────────────────────────────────────────────────
+function renderTopDeals() {
+  const search = (document.getElementById('deals-search')?.value||'').toLowerCase();
+  const minSav = parseFloat(document.getElementById('deals-min-savings')?.value||'-50');
+  const hideFlagged = document.getElementById('deals-hide-flagged')?.checked||false;
+  let deals = report?.top_deals||[];
+  if (search) deals = deals.filter(d=>(d.seller_name||'').toLowerCase().includes(search)||(d.category||'').toLowerCase().includes(search));
+  if (minSav > -50) deals = deals.filter(d=>(d.savings_pct||0)>=minSav);
+  if (hideFlagged) deals = deals.filter(d=>!d.sentinel_flagged);
+  const tbody = document.getElementById('top-deals-body');
+  if (!deals.length) { tbody.innerHTML='<tr><td colspan="12" class="text-slate-500 text-center py-6">No matching deals.</td></tr>'; return; }
+  tbody.innerHTML = deals.slice(0,50).map((d,i) => {
+    const tags = [];
+    if (d.moq_waiver_applied||d.moq_waiver) tags.push('<span class="tag tag-moq">MOQ</span>');
+    if ((d.volume_discount_applied||d.volume_discount||0)>0) tags.push(`<span class="tag tag-vol">Vol -${((d.volume_discount_applied||d.volume_discount||0)*100).toFixed(0)}%</span>`);
+    if ((d.llm_tokens_used||d.llm_tokens||0)>0) tags.push('<span class="tag tag-llm">AI</span>');
+    if (d.partial_fulfillment) tags.push('<span class="tag tag-partial">Partial</span>');
+    if (d.batna_used) tags.push('<span class="tag tag-batna">BATNA</span>');
+    if (d.multi_dim_trade==='delivery_trade') tags.push('<span class="tag tag-delivery">Delivery</span>');
+    if (d.multi_dim_trade==='payment_trade') tags.push('<span class="tag tag-payment">Payment</span>');
+    if (d.final_offer_signaling) tags.push('<span class="tag tag-final">Final</span>');
+    if (d.sentinel_flagged) tags.push('<span class="tag tag-alert">⚠</span>');
+    const flaggedCls = d.sentinel_flagged ? ' sentinel-flagged' : '';
+    return `<tr class="cursor-pointer${flaggedCls}" onclick="openDealModal(${i},${JSON.stringify(deals.map((_,j)=>j)).replace(/"/g,'')})">
+      <td class="text-yellow-400 font-bold text-xs">#${i+1}</td>
+      <td class="text-white text-xs">${d.seller_name||'—'}</td>
+      <td class="text-slate-400 text-xs">${(d.category||'').replace(/_/g,' ')}</td>
+      <td class="text-emerald-400 font-semibold text-xs">Rs.${(d.final_price||0).toLocaleString('en-IN',{maximumFractionDigits:1})}</td>
+      <td class="text-slate-400 text-xs">${(d.quantity||0).toLocaleString()}</td>
+      <td><span class="badge ${qualBadge(d.quality_grade)}">${d.quality_grade||'—'}</span></td>
+      <td class="text-slate-400 text-xs">${d.delivery_days||'—'}d</td>
+      <td class="text-slate-500 text-xs">${(d.payment_term||'—').replace(/_/g,' ')}</td>
+      <td class="text-slate-400 text-xs">${d.negotiation_rounds||d.rounds||'—'}</td>
+      <td class="${savingsClass(d.savings_pct)} text-xs">${fmtPct(d.savings_pct)}</td>
+      <td class="text-purple-400 font-semibold text-xs">${(d.composite_score||0).toFixed(3)}</td>
+      <td>${tags.join('')}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Deal Drill-Down Modal ──────────────────────────────────────────────────────
+let _modalDeals = [];
+function openDealModal(idx, _ignored) {
+  const deals = report?.top_deals || [];
+  const d = deals[idx];
+  if (!d) return;
+  _modalDeals = deals;
+  document.getElementById('modal-title').textContent = `${d.seller_name||'—'} — ${(d.category||'').replace(/_/g,' ')}`;
+  document.getElementById('modal-subtitle').textContent = `Rank #${idx+1} · Score ${(d.composite_score||0).toFixed(3)} · ${d.deal_reached ? 'Deal Closed ✅' : 'No Deal ❌'}`;
+  document.getElementById('modal-metrics').innerHTML = [
+    {label:'Final Price',value:'Rs.'+(d.final_price||0).toLocaleString('en-IN',{maximumFractionDigits:1}),color:'text-emerald-400'},
+    {label:'Quantity',value:(d.quantity||0).toLocaleString()+' units',color:'text-white'},
+    {label:'Savings vs Budget',value:fmtPct(d.savings_pct),color:savingsClass(d.savings_pct)},
+    {label:'Quality Grade',value:'Grade-'+(d.quality_grade||'—'),color:'text-blue-400'},
+    {label:'Delivery',value:(d.delivery_days||'—')+' days',color:'text-yellow-400'},
+    {label:'Payment',value:(d.payment_term||'—').replace(/_/g,' '),color:'text-slate-300'},
+  ].map(m=>`<div class="card p-3"><div class="text-xs text-slate-500">${m.label}</div><div class="font-bold ${m.color} text-sm mt-0.5">${m.value}</div></div>`).join('');
+  const narrative = (d.narrative||'').trim().replace(/^\|/,'').split('|').filter(Boolean);
+  document.getElementById('modal-narrative').innerHTML = narrative.length
+    ? '<div class="text-xs text-slate-400 font-semibold mb-2">Why this deal?</div>' + narrative.map(n=>`<span class="badge badge-blue mr-1 mb-1">${n.trim()}</span>`).join('')
+    : '';
+  const traj = d.offer_trajectory || [];
+  document.getElementById('modal-trajectory').innerHTML = traj.length
+    ? traj.map((t,i)=>(i>0?'<span class="text-slate-700 text-xs">→</span>':'')+`<span class="offer-chip buyer-chip">B:Rs.${Math.round(t.buyer_price||0).toLocaleString('en-IN')}</span>`+(t.seller_price!=null?`<span class="offer-chip seller-chip">S:Rs.${Math.round(t.seller_price).toLocaleString('en-IN')}</span>`:'')).join('')
+    : '<span class="text-slate-600 text-xs">No trajectory data</span>';
+  const flags = [];
+  if (d.moq_waiver_applied||d.moq_waiver) flags.push(['MOQ Waiver','badge-purple']);
+  if ((d.llm_tokens_used||d.llm_tokens||0)>0) flags.push(['AI Mediated','badge-blue']);
+  if (d.batna_used) flags.push(['BATNA Walk','badge-blue']);
+  if (d.multi_dim_trade) flags.push([d.multi_dim_trade.replace(/_/g,' '),'badge-green']);
+  if (d.final_offer_signaling) flags.push(['Final Offer Close','badge-purple']);
+  if (d.sentinel_flagged) flags.push(['⚠ Sentinel Flagged','badge-red']);
+  if (d.partial_fulfillment) flags.push(['Partial Order','badge-yellow']);
+  if (d.deadline_pressure_applied) flags.push(['Urgency Applied','badge-orange']);
+  if (d.close_reason) flags.push([d.close_reason.replace(/_/g,' '),'badge-blue']);
+  document.getElementById('modal-flags').innerHTML = flags.map(([l,c])=>`<span class="badge ${c}">${l}</span>`).join('');
+  document.getElementById('deal-modal').classList.remove('hidden');
+}
+function closeDealModal() { document.getElementById('deal-modal').classList.add('hidden'); }
+
+// ── Offer Trajectories ─────────────────────────────────────────────────────────
+function renderTrajectories() {
+  const container = document.getElementById('trajectory-cards');
+  const deals = (report.top_deals||[]).filter(d=>d.offer_trajectory&&d.offer_trajectory.length>0).slice(0,8);
+  const misses = (report.close_misses||report.notable_failures||[]).filter(m=>m.offer_trajectory&&m.offer_trajectory.length>0).slice(0,4);
+  const all = [...deals.map(d=>({...d,_type:'deal'})),...misses.map(m=>({...m,_type:'miss'}))];
+  if (!all.length) { container.innerHTML='<div class="card p-6 text-slate-500 text-sm">No trajectory data. Trajectory data is included when negotiations have detailed round-by-round data.</div>'; return; }
+  container.innerHTML = all.map(item => {
+    const isMiss = item._type==='miss';
+    const title = isMiss ? `CLOSE MISS: ${item.seller_name||''} × ${item.buyer_id||''}` : `${item.seller_name||''} — ${(item.category||'').replace(/_/g,' ')}`;
+    const chips = (item.offer_trajectory||[]).map((t,i)=>
+      (i>0?'<span class="text-slate-700 text-xs">→</span>':'')+
+      `<span class="offer-chip buyer-chip">B:Rs.${Math.round(t.buyer_price||0).toLocaleString('en-IN')}</span>`+
+      (t.seller_price!=null?`<span class="offer-chip seller-chip">S:Rs.${Math.round(t.seller_price).toLocaleString('en-IN')}</span>`:'')
+    ).join('');
+    return `<div class="card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <div class="font-semibold text-sm ${isMiss?'text-yellow-400':'text-white'}">${title}</div>
+        <div class="flex gap-2"><span class="badge ${isMiss?'badge-yellow':'badge-green'}">${isMiss?'Deadlock':'Deal Closed'}</span>${item.close_reason?`<span class="badge badge-blue">${item.close_reason.replace(/_/g,' ')}</span>`:''}</div>
+      </div>
+      <div class="trajectory">${chips||'<span class="text-slate-600 text-xs">No round-by-round data</span>'}</div>
+      ${isMiss?'<div class="mt-2 text-xs text-blue-400">Fix: ↑ max_rounds or switch to Conceder strategy</div>':''}
+    </div>`;
+  }).join('');
+}
+
+// ── Sentinel Tab ───────────────────────────────────────────────────────────────
+function renderSentinelTab() {
+  const sent = report?.sentinel || {};
+  document.getElementById('sent-critical').textContent = (sent.critical||0).toLocaleString();
+  document.getElementById('sent-warnings').textContent = (sent.warnings||0).toLocaleString();
+  document.getElementById('sent-info').textContent     = (sent.info||0).toLocaleString();
+  document.getElementById('sent-sessions').textContent = (sent.total_sessions_monitored||0).toLocaleString();
+  const bycat = sent.by_category || {};
+  const catCard = document.getElementById('sent-by-category-card');
+  if (Object.keys(bycat).length) {
+    catCard.style.display = '';
+    document.getElementById('sent-by-category').innerHTML = Object.entries(bycat).map(([cat,cnt])=>`<span class="badge badge-yellow">${cat}: ${cnt}</span>`).join('');
+  }
+  const tbody = document.getElementById('sentinel-alerts-body');
+  const alerts = sent.sample_alerts || [];
+  if (!alerts.length) {
+    const msg = (sent.critical===0 && sent.total_sessions_monitored>0) ? '✅ No alerts — all negotiations clean!' : 'Run stress test to populate sentinel data.';
+    const cls = (sent.critical===0 && sent.total_sessions_monitored>0) ? 'text-emerald-400' : 'text-slate-500';
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 ${cls}">${msg}</td></tr>`;
+    return;
+  }
+  const sevMap = {critical:'badge-red',warning:'badge-yellow',info:'badge-blue'};
+  tbody.innerHTML = alerts.map(a=>`
+    <tr class="${a.severity==='critical'?'sentinel-flagged':''}">
+      <td><span class="badge ${sevMap[a.severity]||'badge-blue'}">${a.severity||'info'}</span></td>
+      <td class="text-slate-400 text-xs">${a.category||'—'}</td>
+      <td class="text-slate-300 text-xs font-mono">${(a.alert_id||'').substring(0,28)}</td>
+      <td class="text-slate-500 text-xs">${(a.deal_session||'').substring(0,22)}</td>
+      <td class="text-slate-300 text-xs">${a.message||'—'}</td>
+    </tr>`).join('');
+  // Update nav tab badge
+  const navEl = document.getElementById('tab-sentinel-nav');
+  navEl.textContent = sent.critical > 0 ? `🛡 Sentinel ⚠${sent.critical}` : '🛡 Sentinel ✅';
+}
+
+// ── Live Negotiation ───────────────────────────────────────────────────────────
+function setQuality(q) {
+  _liveQuality = q;
+  ['A','B','C'].forEach(v=>document.getElementById('qual-'+v).classList.toggle('active',v===q));
+}
+function setUrgency(u) {
+  _liveUrgency = u;
+  ['low','normal','high','urgent'].forEach(v=>document.getElementById('urg-'+v).classList.toggle('active',v===u));
+}
+async function runLiveNegotiation() {
+  const category = document.getElementById('live-category').value;
+  const qty = parseInt(document.getElementById('live-qty').value)||0;
+  const target = parseFloat(document.getElementById('live-target').value)||0;
+  const max = parseFloat(document.getElementById('live-max').value)||0;
+  const deadline = parseInt(document.getElementById('live-deadline').value)||30;
+  const payment = document.getElementById('live-payment').value;
+  const state = document.getElementById('live-state').value;
+  const name = document.getElementById('live-name').value||'Dashboard User';
+  const errEl = document.getElementById('live-error');
+  errEl.classList.add('hidden');
+  if (!category) { errEl.textContent='⚠ Please select a category.'; errEl.classList.remove('hidden'); return; }
+  if (!qty||qty<1) { errEl.textContent='⚠ Please enter a valid quantity (≥ 1).'; errEl.classList.remove('hidden'); return; }
+  if (!target||target<1) { errEl.textContent='⚠ Please enter a valid target price.'; errEl.classList.remove('hidden'); return; }
+  if (!max||max<target) { errEl.textContent='⚠ Max price must be ≥ target price.'; errEl.classList.remove('hidden'); return; }
+  document.getElementById('live-placeholder').classList.add('hidden');
+  document.getElementById('live-results').classList.add('hidden');
+  document.getElementById('live-loading').classList.remove('hidden');
+  document.getElementById('btn-live').disabled = true;
+  try {
+    const res = await fetch('/api/stats/run-single', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({category,quantity:qty,target_price:target,max_price:max,quality_min:_liveQuality,deadline_days:deadline,payment_preference:payment,urgency_level:_liveUrgency,location_state:state,buyer_name:name})});
+    if (!res.ok) { const err=await res.json().catch(()=>({detail:'Server error'})); throw new Error(err.detail||'Request failed'); }
+    renderLiveResults(await res.json(), name);
+  } catch(e) {
+    errEl.textContent='⚠ '+e.message; errEl.classList.remove('hidden');
+    document.getElementById('live-loading').classList.add('hidden');
+    document.getElementById('live-placeholder').classList.remove('hidden');
+  } finally { document.getElementById('btn-live').disabled=false; }
+}
+function renderLiveResults(data, buyerName) {
+  document.getElementById('live-loading').classList.add('hidden');
+  const deals = data.top_deals||[];
+  document.getElementById('live-results-title').textContent = `${deals.length} deals found for ${buyerName}`;
+  document.getElementById('live-results-meta').textContent = `${data.total_queried} sellers queried · ${data.deals_found} reached · showing top ${deals.length}`;
+  const container = document.getElementById('live-deal-cards');
+  if (!deals.length) { container.innerHTML='<div class="card p-6 text-center text-slate-500">No deals found. Try relaxing requirements (lower quality min, higher max price).</div>'; }
+  else { container.innerHTML = deals.map((d,i)=>{
+    const tags=[];
+    if (d.moq_waiver_applied) tags.push('<span class="tag tag-moq">MOQ</span>');
+    if ((d.volume_discount_applied||0)>0) tags.push('<span class="tag tag-vol">Vol Discount</span>');
+    if (d.batna_used) tags.push('<span class="tag tag-batna">BATNA</span>');
+    if (d.multi_dim_trade) tags.push(`<span class="tag tag-delivery">${d.multi_dim_trade.replace(/_/g,' ')}</span>`);
+    if (d.final_offer_signaling) tags.push('<span class="tag tag-final">Final Offer</span>');
+    const savPct = d.savings_pct||0;
+    return `<div class="deal-card mb-3">
+      <div class="flex items-start justify-between mb-2">
+        <div><span class="text-yellow-400 font-bold text-sm">#${i+1}</span><span class="text-white font-semibold text-sm ml-2">${d.seller_name||'—'}</span></div>
+        <div class="text-right"><div class="text-emerald-400 font-bold">Rs.${(d.final_price||0).toLocaleString('en-IN',{maximumFractionDigits:1})}<span class="text-slate-500 font-normal text-xs">/unit</span></div><div class="text-xs ${savingsClass(savPct)}">${fmtPct(savPct)} savings</div></div>
+      </div>
+      <div class="grid grid-cols-4 gap-2 text-xs mb-2">
+        <div class="text-slate-500">Grade <span class="text-white font-semibold">${d.quality_grade||'—'}</span></div>
+        <div class="text-slate-500">Delivery <span class="text-white font-semibold">${d.delivery_days||'—'}d</span></div>
+        <div class="text-slate-500">Payment <span class="text-white">${(d.payment_term||'—').replace(/_/g,' ')}</span></div>
+        <div class="text-slate-500">Score <span class="text-purple-400 font-semibold">${(d.composite_score||0).toFixed(3)}</span></div>
+      </div>
+      <div class="text-xs flex items-center gap-1 flex-wrap">${tags.join('')}${d.narrative?d.narrative.split('|').filter(Boolean).map(n=>`<span class="tag">${n.trim()}</span>`).join(''):''}</div>
+    </div>`;
+  }).join(''); }
+  document.getElementById('live-results').classList.remove('hidden');
+}
+
+// ── Add Test Seller ────────────────────────────────────────────────────────────
+function toggleAddSeller() {
+  const form = document.getElementById('add-seller-form');
+  const chev = document.getElementById('add-seller-chevron');
+  form.classList.toggle('hidden');
+  chev.textContent = form.classList.contains('hidden') ? '▼ Show' : '▲ Hide';
+}
+function addTestSeller() {
+  const s = {name:document.getElementById('ts-name').value||'Test Seller '+(_testSellers.length+1),category:document.getElementById('ts-category').value,floor:parseFloat(document.getElementById('ts-floor').value)||800,list:parseFloat(document.getElementById('ts-list').value)||1000,moq:parseInt(document.getElementById('ts-moq').value)||500,quality:document.getElementById('ts-quality').value,strategy:document.getElementById('ts-strategy').value};
+  _testSellers.push(s);
+  document.getElementById('test-sellers-list').innerHTML = `<div class="text-slate-400 mt-1 font-semibold">Pool (${_testSellers.length}):</div>`+_testSellers.map(t=>`<div class="text-slate-500 py-0.5">• ${t.name} — ${t.category.replace(/_/g,' ')} | Rs.${t.floor}–${t.list} | Grade ${t.quality} | ${t.strategy}</div>`).join('');
+  document.getElementById('ts-name').value='';
+}
+
+// ── Export CSV ─────────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (!report||!report.top_deals||!report.top_deals.length) { alert('No report data. Run a stress test first.'); return; }
+  const rows = report.top_deals;
+  const csv = ['Rank,Seller,Category,Final Price,Qty,Quality,Delivery Days,Payment Term,Rounds,Savings%,VS List%,Score,MOQ Waiver,Partial,LLM,BATNA,Multi-Dim Trade,Sentinel Flagged',
+    ...rows.map((r,i)=>`${i+1},"${r.seller_name||''}","${(r.category||'').replace(/_/g,' ')}",${r.final_price||0},${r.quantity||0},${r.quality_grade||''},${r.delivery_days||0},"${(r.payment_term||'').replace(/_/g,' ')}",${r.negotiation_rounds||r.rounds||0},${(r.savings_pct||0).toFixed(2)},${(r.vs_list_pct||0).toFixed(2)},${(r.composite_score||0).toFixed(4)},${r.moq_waiver_applied?'Yes':'No'},${r.partial_fulfillment?'Yes':'No'},${(r.llm_tokens_used||r.llm_tokens||0)>0?'Yes':'No'},${r.batna_used?'Yes':'No'},"${r.multi_dim_trade||''}",${r.sentinel_flagged?'Yes':'No'}`)
+  ].join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'top_deals_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+// ── Stress Test Runner ─────────────────────────────────────────────────────────
+async function runTest(buyersPerCat, useLlm=false) {
+  if (running) return;
+  running=true; setButtonsDisabled(true);
+  document.getElementById('progress-container').classList.remove('hidden');
+  document.getElementById('progress-fill').style.width='0%';
+  document.getElementById('progress-pct-text').textContent='0%';
+  document.getElementById('progress-label-text').textContent = useLlm?'Running with Ollama AI mediation (~2 min)…':'Running stress test…';
+  try {
+    const r = await fetch(`/api/stats/run-stress-test?buyers_per_category=${buyersPerCat}&max_rounds=10&use_llm=${useLlm}&seed=42`,{method:'POST'});
+    if (!r.ok) throw new Error(await r.text());
+    startSSEProgress();
+  } catch(e) { alert('Error starting: '+e.message); resetRun(); }
+}
+function startSSEProgress() {
+  if (sseSource) { sseSource.close(); sseSource=null; }
+  sseSource = new EventSource('/api/stats/stream-progress');
+  sseSource.onmessage = function(e) {
+    try {
+      const data = JSON.parse(e.data);
+      const pct = Math.min(99,data.pct||0);
+      document.getElementById('progress-fill').style.width=pct+'%';
+      document.getElementById('progress-pct-text').textContent=pct.toFixed(0)+'%';
+      document.getElementById('progress-label-text').textContent = data.done&&data.total?`Running… ${data.done}/${data.total} buyers`:'Running stress test…';
+      if (!data.running&&pct>=99) { document.getElementById('progress-fill').style.width='100%'; document.getElementById('progress-pct-text').textContent='100%'; sseSource.close(); sseSource=null; setTimeout(()=>loadReport().then(resetRun),800); }
+    } catch(err){}
+  };
+  sseSource.onerror = function() { if(sseSource){sseSource.close();sseSource=null;} pollUntilDone(); };
+}
+async function pollUntilDone() {
+  try {
+    const r=await fetch('/api/stats/run-status'); const s=await r.json();
+    const pct=s.progress||0;
+    document.getElementById('progress-fill').style.width=pct+'%';
+    document.getElementById('progress-pct-text').textContent=pct.toFixed(0)+'%';
+    if(!s.running){document.getElementById('progress-fill').style.width='100%';await loadReport();resetRun();}
+    else setTimeout(pollUntilDone,1500);
+  } catch(e){setTimeout(pollUntilDone,2000);}
+}
+const SPIN_ICON='<svg class="w-3.5 h-3.5 spinner" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>';
+const ZAP_ICON='<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>';
+const BRAIN_ICON='<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>';
+function setButtonsDisabled(disabled) {
+  ['btn-1k','btn-10k','btn-llm'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=disabled;});
+  if(disabled){document.getElementById('btn-1k').innerHTML=SPIN_ICON+' Running…';document.getElementById('btn-10k').innerHTML=SPIN_ICON+' Running…';document.getElementById('btn-llm').innerHTML=SPIN_ICON+' Running…';}
+  else{document.getElementById('btn-1k').innerHTML=ZAP_ICON+' Run ~1K';document.getElementById('btn-10k').innerHTML=ZAP_ICON+' Run ~10K';document.getElementById('btn-llm').innerHTML=BRAIN_ICON+' LLM Demo';}
+}
+function resetRun(){running=false;setButtonsDisabled(false);document.getElementById('progress-container').classList.add('hidden');}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+loadReport();
+setInterval(loadReport,45000);
+</script>
+</body>
+</html>

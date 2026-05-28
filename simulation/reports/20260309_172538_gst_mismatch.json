@@ -1,0 +1,7 @@
+[
+  {
+    "scenario": "gst_mismatch",
+    "status": "ERROR",
+    "error": "unexpected character after line continuation character (test_gst_mismatch.py, line 80)"
+  }
+]

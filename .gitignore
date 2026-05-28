@@ -1,0 +1,69 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# PACT — Root .gitignore File
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Environment files (must NEVER be committed to version control)
+.env
+.env.*
+!.env.example
+
+# Next.js Build and Dependencies (Frontend Dashboard)
+dashboard/node_modules/
+dashboard/.next/
+dashboard/out/
+dashboard/build/
+dashboard/*.tsbuildinfo
+dashboard/next-env.d.ts
+
+# Node.js General
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.eslintcache
+
+# Python Caches and Compilation
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# Python Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+dist/
+build/
+*.egg-info/
+
+# Databases and Local Storage
+*.db
+*.sqlite
+*.sqlite3
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs, Editors, and Tooling
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# AI Coding Assistant Settings
+.claude/

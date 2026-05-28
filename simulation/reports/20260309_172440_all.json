@@ -1,0 +1,578 @@
+[
+  {
+    "scenario": "baseline",
+    "data": [
+      {
+        "buyer_id": "B001",
+        "buyer_name": "Patel Garments Pvt Ltd",
+        "total_sellers_queried": 6,
+        "deals_reached": 4,
+        "deals_failed": 2,
+        "failure_reasons": {
+          "moq_not_met": 2
+        },
+        "top_deals": [
+          {
+            "seller_id": "S031",
+            "seller_name": "Swaraj Exports 31",
+            "final_price": 5269.27,
+            "quantity": 100,
+            "quality_grade": "B",
+            "delivery_days": 12,
+            "payment_term": "net_15",
+            "negotiation_rounds": 1,
+            "composite_score": 0.425,
+            "narrative": " | Best price | Fastest delivery"
+          },
+          {
+            "seller_id": "S021",
+            "seller_name": "National Suppliers 21",
+            "final_price": 5269.27,
+            "quantity": 100,
+            "quality_grade": "A",
+            "delivery_days": 14,
+            "payment_term": "net_30",
+            "negotiation_rounds": 1,
+            "composite_score": 0.3625,
+            "narrative": " | Best quality | Best payment terms"
+          },
+          {
+            "seller_id": "S051",
+            "seller_name": "Rajhans Suppliers 51",
+            "final_price": 5269.27,
+            "quantity": 100,
+            "quality_grade": "B",
+            "delivery_days": 14,
+            "payment_term": "net_30",
+            "negotiation_rounds": 1,
+            "composite_score": 0.2625,
+            "narrative": ""
+          },
+          {
+            "seller_id": "S091",
+            "seller_name": "Delta Chemicals 91",
+            "final_price": 5269.27,
+            "quantity": 100,
+            "quality_grade": "B",
+            "delivery_days": 14,
+            "payment_term": "net_15",
+            "negotiation_rounds": 1,
+            "composite_score": 0.225,
+            "narrative": ""
+          }
+        ],
+        "shortlist_text": "\nTop 4 deals for Patel Garments Pvt Ltd:\n============================================================\n1. Swaraj Exports 31 [S031]\n   Price: Rs.5,269.27/unit | Qty: 100 units\n   Quality: Grade-B | Delivery: 12 days\n   Payment: net_15 | Score: 0.425\n   Best price | Fastest delivery\n2. National Suppliers 21 [S021]\n   Price: Rs.5,269.27/unit | Qty: 100 units\n   Quality: Grade-A | Delivery: 14 days\n   Payment: net_30 | Score: 0.362\n   Best quality | Best payment terms\n3. Rajhans Suppliers 51 [S051]\n   Price: Rs.5,269.27/unit | Qty: 100 units\n   Quality: Grade-B | Delivery: 14 days\n   Payment: net_30 | Score: 0.263\n   Good overall deal\n4. Delta Chemicals 91 [S091]\n   Price: Rs.5,269.27/unit | Qty: 100 units\n   Quality: Grade-B | Delivery: 14 days\n   Payment: net_15 | Score: 0.225\n   Good overall deal"
+      },
+      {
+        "buyer_id": "B002",
+        "buyer_name": "Singh Auto Works",
+        "total_sellers_queried": 5,
+        "deals_reached": 4,
+        "deals_failed": 1,
+        "failure_reasons": {
+          "moq_not_met": 1
+        },
+        "top_deals": [
+          {
+            "seller_id": "S002",
+            "seller_name": "Janata Industries 2",
+            "final_price": 834.6,
+            "quantity": 50,
+            "quality_grade": "A",
+            "delivery_days": 21,
+            "payment_term": "net_30",
+            "negotiation_rounds": 1,
+            "composite_score": 0.3625,
+            "narrative": " | Best price | Best quality | Fastest delivery | Best payment terms"
+          },
+          {
+            "seller_id": "S042",
+            "seller_name": "Lok Traders 42",
+            "final_price": 834.6,
+            "quantity": 50,
+            "quality_grade": "B",
+            "delivery_days": 21,
+            "payment_term": "advance_50",
+            "negotiation_rounds": 1,
+            "composite_score": 0.1875,
+            "narrative": ""
+          },
+          {
+            "seller_id": "S052",
+            "seller_name": "Hindustan Components 52",
+            "final_price": 834.6,
+            "quantity": 50,
+            "quality_grade": "B",
+            "delivery_days": 21,
+            "payment_term": "advance_100",
+            "negotiation_rounds": 1,
+            "composite_score": 0.15,
+            "narrative": ""
+          },
+          {
+            "seller_id": "S032",
+            "seller_name": "Gamma Electronics 32",
+            "final_price": 834.6,
+            "quantity": 50,
+            "quality_grade": "C",
+            "delivery_days": 21,
+            "payment_term": "advance_50",
+            "negotiation_rounds": 1,
+            "composite_score": 0.1125,
+            "narrative": ""
+          }
+        ],
+        "shortlist_text": "\nTop 4 deals for Singh Auto Works:\n============================================================\n1. Janata Industries 2 [S002]\n   Price: Rs.834.60/unit | Qty: 50 units\n   Quality: Grade-A | Delivery: 21 days\n   Payment: net_30 | Score: 0.362\n   Best price | Best quality | Fastest delivery | Best payment terms\n2. Lok Traders 42 [S042]\n   Price: Rs.834.60/unit | Qty: 50 units\n   Quality: Grade-B | Delivery: 21 days\n   Payment: advance_50 | Score: 0.188\n   Good overall deal\n3. Hindustan Components 52 [S052]\n   Price: Rs.834.60/unit | Qty: 50 units\n   Quality: Grade-B | Delivery: 21 days\n   Payment: advance_100 | Score: 0.150\n   Good overall deal\n4. Gamma Electronics 32 [S032]\n   Price: Rs.834.60/unit | Qty: 50 units\n   Quality: Grade-C | Delivery: 21 days\n   Payment: advance_50 | Score: 0.113\n   Good overall deal"
+      },
+      {
+        "buyer_id": "B003",
+        "buyer_name": "Kumar Electronics",
+        "total_sellers_queried": 3,
+        "deals_reached": 3,
+        "deals_failed": 0,
+        "failure_reasons": {},
+        "top_deals": [
+          {
+            "seller_id": "S043",
+            "seller_name": "Iota Auto Parts 43",
+            "final_price": 2158.56,
+            "quantity": 100,
+            "quality_grade": "A",
+            "delivery_days": 18,
+            "payment_term": "advance_100",
+            "negotiation_rounds": 1,
+            "composite_score": 0.45,
+            "narrative": " | Best price | Best quality | Fastest delivery"
+          },
+          {
+            "seller_id": "S033",
+            "seller_name": "Swaraj Exports 33",
+            "final_price": 2158.56,
+            "quantity": 100,
+            "quality_grade": "A",
+            "delivery_days": 22,
+            "payment_term": "advance_50",
+            "negotiation_rounds": 1,
+            "composite_score": 0.2875,
+            "narrative": ""
+          },
+          {
+            "seller_id": "S093",
+            "seller_name": "Swaraj Exports 93",
+            "final_price": 2158.56,
+            "quantity": 100,
+            "quality_grade": "B",
+            "delivery_days": 21,
+            "payment_term": "net_15",
+            "negotiation_rounds": 1,
+            "composite_score": 0.275,
+            "narrative": " | Best payment terms"
+          }
+        ],
+        "shortlist_text": "\nTop 3 deals for Kumar Electronics:\n============================================================\n1. Iota Auto Parts 43 [S043]\n   Price: Rs.2,158.56/unit | Qty: 100 units\n   Quality: Grade-A | Delivery: 18 days\n   Payment: advance_100 | Score: 0.450\n   Best price | Best quality | Fastest delivery\n2. Swaraj Exports 33 [S033]\n   Price: Rs.2,158.56/unit | Qty: 100 units\n   Quality: Grade-A | Delivery: 22 days\n   Payment: advance_50 | Score: 0.287\n   Good overall deal\n3. Swaraj Exports 93 [S093]\n   Price: Rs.2,158.56/unit | Qty: 100 units\n   Quality: Grade-B | Delivery: 21 days\n   Payment: net_15 | Score: 0.275\n   Best payment terms"
+      },
+      {
+        "buyer_id": "B004",
+        "buyer_name": "Sharma Packaging Ltd",
+        "total_sellers_queried": 2,
+        "deals_reached": 1,
+        "deals_failed": 1,
+        "failure_reasons": {
+          "max_rounds_no_deal": 1
+        },
+        "top_deals": [
+          {
+            "seller_id": "S074",
+            "seller_name": "Delta Chemicals 74",
+            "final_price": 2291.14,
+            "quantity": 200,
+            "quality_grade": "A",
+            "delivery_days": 14,
+            "payment_term": "advance_50",
+            "negotiation_rounds": 1,
+            "composite_score": 0.2875,
+            "narrative": " | Best price | Best quality | Fastest delivery | Best payment terms"
+          }
+        ],
+        "shortlist_text": "\nTop 1 deals for Sharma Packaging Ltd:\n============================================================\n1. Delta Chemicals 74 [S074]\n   Price: Rs.2,291.14/unit | Qty: 200 units\n   Quality: Grade-A | Delivery: 14 days\n   Payment: advance_50 | Score: 0.287\n   Best price | Best quality | Fastest delivery | Best payment terms"
+      },
+      {
+        "buyer_id": "B005",
+        "buyer_name": "Mehta Steel Fabricators",
+        "total_sellers_queried": 4,
+        "deals_reached": 3,
+        "deals_failed": 1,
+        "failure_reasons": {
+          "insufficient_stock": 1
+        },
+        "top_deals": [
+          {
+            "seller_id": "S055",
+            "seller_name": "Hindustan Components 55",
+            "final_price": 531.93,
+            "quantity": 500,
+            "quality_grade": "A",
+            "delivery_days": 17,
+            "payment_term": "net_15",
+            "negotiation_rounds": 1,
+            "composite_score": 0.525,
+            "narrative": " | Best price | Best quality | Fastest delivery | Best payment terms"
+          },
+          {
+            "seller_id": "S035",
+            "seller_name": "Pioneer Industries 35",
+            "final_price": 531.93,
+            "quantity": 500,
+            "quality_grade": "A",
+            "delivery_days": 21,
+            "payment_term": "advance_100",
+            "negotiation_rounds": 1,
+            "composite_score": 0.25,
+            "narrative": ""
+          },
+          {
+            "seller_id": "S045",
+            "seller_name": "Swaraj Exports 45",
+            "final_price": 531.93,
+            "quantity": 500,
+            "quality_grade": "B",
+            "delivery_days": 21,
+            "payment_term": "net_15",
+            "negotiation_rounds": 1,
+            "composite_score": 0.225,
+            "narrative": ""
+          }
+        ],
+        "shortlist_text": "\nTop 3 deals for Mehta Steel Fabricators:\n============================================================\n1. Hindustan Components 55 [S055]\n   Price: Rs.531.93/unit | Qty: 500 units\n   Quality: Grade-A | Delivery: 17 days\n   Payment: net_15 | Score: 0.525\n   Best price | Best quality | Fastest delivery | Best payment terms\n2. Pioneer Industries 35 [S035]\n   Price: Rs.531.93/unit | Qty: 500 units\n   Quality: Grade-A | Delivery: 21 days\n   Payment: advance_100 | Score: 0.250\n   Good overall deal\n3. Swaraj Exports 45 [S045]\n   Price: Rs.531.93/unit | Qty: 500 units\n   Quality: Grade-B | Delivery: 21 days\n   Payment: net_15 | Score: 0.225\n   Good overall deal"
+      },
+      {
+        "buyer_id": "B006",
+        "buyer_name": "Joshi Chemical Industries",
+        "total_sellers_queried": 1,
+        "deals_reached": 1,
+        "deals_failed": 0,
+        "failure_reasons": {},
+        "top_deals": [
+          {
+            "seller_id": "S096",
+            "seller_name": "Beta Plastics 96",
+            "final_price": 242.29,
+            "quantity": 100,
+            "quality_grade": "A",
+            "delivery_days": 26,
+            "payment_term": "net_30",
+            "negotiation_rounds": 1,
+            "composite_score": 0.3625,
+            "narrative": " | Best price | Best quality | Fastest delivery | Best payment terms"
+          }
+        ],
+        "shortlist_text": "\nTop 1 deals for Joshi Chemical Industries:\n============================================================\n1. Beta Plastics 96 [S096]\n   Price: Rs.242.29/unit | Qty: 100 units\n   Quality: Grade-A | Delivery: 26 days\n   Payment: net_30 | Score: 0.362\n   Best price | Best quality | Fastest delivery | Best payment terms"
+      },
+      {
+        "buyer_id": "B007",
+        "buyer_name": "Gupta Textile Mills",
+        "total_sellers_queried": 7,
+        "deals_reached": 6,
+        "deals_failed": 1,
+        "failure_reasons": {
+          "max_rounds_no_deal": 1
+        },
+        "top_deals": [
+          {
+            "seller_id": "S027",
+            "seller_name": "Hindustan Components 27",
+            "final_price": 7824.94,
+            "quantity": 100,
+            "quality_grade": "B",
+            "delivery_days": 10,
+            "payment_term": "net_15",
+            "negotiation_rounds": 1,
+            "composite_score": 0.425,
+            "narrative": " | Best price | Fastest delivery"
+          },
+          {
+            "seller_id": "S097",
+            "seller_name": "Zeta Textiles 97",
+            "final_price": 7824.94,
+            "quantity": 100,
+            "quality_grade": "A",
+            "delivery_days": 21,
+            "payment_term": "net_60",
+            "negotiation_rounds": 1,
+            "composite_score": 0.4,
+            "narrative": " | Best quality | Best payment terms"
+          },
+          {
+            "seller_id": "S047",
+            "seller_name": "National Suppliers 47",
+            "final_price": 7824.94,
+            "quantity": 100,
+            "quality_grade": "A",
+            "delivery_days": 14,
+            "payment_term": "advance_100",
+            "negotiation_rounds": 1,
+            "composite_score": 0.3773,
+            "narrative": ""
+          },
+          {
+            "seller_id": "S067",
+            "seller_name": "Gamma Electronics 67",
+            "final_price": 7824.94,
+            "quantity": 100,
+            "quality_grade": "A",
+            "delivery_days": 21,
+            "payment_term": "advance_100",
+            "negotiation_rounds": 1,
+            "composite_score": 0.25,
+            "narrative": ""
+          },
+          {
+            "seller_id": "S057",
+            "seller_name": "Delta Chemicals 57",
+            "final_price": 7824.94,
+            "quantity": 100,
+            "quality_grade": "B",
+            "delivery_days": 20,
+            "payment_term": "net_15",
+            "negotiation_rounds": 1,
+            "composite_score": 0.2432,
+            "narrative": ""
+          },
+          {
+            "seller_id": "S017",
+            "seller_name": "Beta Plastics 17",
+            "final_price": 7824.94,
+            "quantity": 100,
+            "quality_grade": "B",
+            "delivery_days": 19,
+            "payment_term": "advance_50",
+            "negotiation_rounds": 1,
+            "composite_score": 0.2239,
+            "narrative": ""
+          }
+        ],
+        "shortlist_text": "\nTop 6 deals for Gupta Textile Mills:\n============================================================\n1. Hindustan Components 27 [S027]\n   Price: Rs.7,824.94/unit | Qty: 100 units\n   Quality: Grade-B | Delivery: 10 days\n   Payment: net_15 | Score: 0.425\n   Best price | Fastest delivery\n2. Zeta Textiles 97 [S097]\n   Price: Rs.7,824.94/unit | Qty: 100 units\n   Quality: Grade-A | Delivery: 21 days\n   Payment: net_60 | Score: 0.400\n   Best quality | Best payment terms\n3. National Suppliers 47 [S047]\n   Price: Rs.7,824.94/unit | Qty: 100 units\n   Quality: Grade-A | Delivery: 14 days\n   Payment: advance_100 | Score: 0.377\n   Good overall deal\n4. Gamma Electronics 67 [S067]\n   Price: Rs.7,824.94/unit | Qty: 100 units\n   Quality: Grade-A | Delivery: 21 days\n   Payment: advance_100 | Score: 0.250\n   Good overall deal\n5. Delta Chemicals 57 [S057]\n   Price: Rs.7,824.94/unit | Qty: 100 units\n   Quality: Grade-B | Delivery: 20 days\n   Payment: net_15 | Score: 0.243\n   Good overall deal\n6. Beta Plastics 17 [S017]\n   Price: Rs.7,824.94/unit | Qty: 100 units\n   Quality: Grade-B | Delivery: 19 days\n   Payment: advance_50 | Score: 0.224\n   Good overall deal"
+      },
+      {
+        "buyer_id": "B008",
+        "buyer_name": "Verma Agro Equipment",
+        "total_sellers_queried": 5,
+        "deals_reached": 2,
+        "deals_failed": 3,
+        "failure_reasons": {
+          "max_rounds_no_deal": 2,
+          "insufficient_stock": 1
+        },
+        "top_deals": [
+          {
+            "seller_id": "S028",
+            "seller_name": "Balaji Industries 28",
+            "final_price": 1550.37,
+            "quantity": 100,
+            "quality_grade": "B",
+            "delivery_days": 18,
+            "payment_term": "net_15",
+            "negotiation_rounds": 1,
+            "composite_score": 0.425,
+            "narrative": " | Best price | Best quality | Fastest delivery | Best payment terms"
+          },
+          {
+            "seller_id": "S098",
+            "seller_name": "Zeta Textiles 98",
+            "final_price": 1550.37,
+            "quantity": 100,
+            "quality_grade": "C",
+            "delivery_days": 24,
+            "payment_term": "advance_50",
+            "negotiation_rounds": 1,
+            "composite_score": 0.1125,
+            "narrative": ""
+          }
+        ],
+        "shortlist_text": "\nTop 2 deals for Verma Agro Equipment:\n============================================================\n1. Balaji Industries 28 [S028]\n   Price: Rs.1,550.37/unit | Qty: 100 units\n   Quality: Grade-B | Delivery: 18 days\n   Payment: net_15 | Score: 0.425\n   Best price | Best quality | Fastest delivery | Best payment terms\n2. Zeta Textiles 98 [S098]\n   Price: Rs.1,550.37/unit | Qty: 100 units\n   Quality: Grade-C | Delivery: 24 days\n   Payment: advance_50 | Score: 0.113\n   Good overall deal"
+      },
+      {
+        "buyer_id": "B009",
+        "buyer_name": "Rao Ceramics Exports",
+        "total_sellers_queried": 4,
+        "deals_reached": 1,
+        "deals_failed": 3,
+        "failure_reasons": {
+          "moq_not_met": 3
+        },
+        "top_deals": [
+          {
+            "seller_id": "S089",
+            "seller_name": "Xi Chemical Works 89",
+            "final_price": 13100.05,
+            "quantity": 50,
+            "quality_grade": "A",
+            "delivery_days": 17,
+            "payment_term": "net_30",
+            "negotiation_rounds": 1,
+            "composite_score": 0.3625,
+            "narrative": " | Best price | Best quality | Fastest delivery | Best payment terms"
+          }
+        ],
+        "shortlist_text": "\nTop 1 deals for Rao Ceramics Exports:\n============================================================\n1. Xi Chemical Works 89 [S089]\n   Price: Rs.13,100.05/unit | Qty: 50 units\n   Quality: Grade-A | Delivery: 17 days\n   Payment: net_30 | Score: 0.362\n   Best price | Best quality | Fastest delivery | Best payment terms"
+      },
+      {
+        "buyer_id": "B010",
+        "buyer_name": "Nair Leather Goods",
+        "total_sellers_queried": 3,
+        "deals_reached": 2,
+        "deals_failed": 1,
+        "failure_reasons": {
+          "max_rounds_no_deal": 1
+        },
+        "top_deals": [
+          {
+            "seller_id": "S050",
+            "seller_name": "Alpha Steel 50",
+            "final_price": 3859.41,
+            "quantity": 500,
+            "quality_grade": "A",
+            "delivery_days": 21,
+            "payment_term": "advance_50",
+            "negotiation_rounds": 1,
+            "composite_score": 0.2875,
+            "narrative": " | Best price | Best quality | Fastest delivery | Best payment terms"
+          },
+          {
+            "seller_id": "S070",
+            "seller_name": "Bharat Metal Works 70",
+            "final_price": 3859.41,
+            "quantity": 500,
+            "quality_grade": "B",
+            "delivery_days": 21,
+            "payment_term": "advance_50",
+            "negotiation_rounds": 1,
+            "composite_score": 0.1875,
+            "narrative": ""
+          }
+        ],
+        "shortlist_text": "\nTop 2 deals for Nair Leather Goods:\n============================================================\n1. Alpha Steel 50 [S050]\n   Price: Rs.3,859.41/unit | Qty: 500 units\n   Quality: Grade-A | Delivery: 21 days\n   Payment: advance_50 | Score: 0.287\n   Best price | Best quality | Fastest delivery | Best payment terms\n2. Bharat Metal Works 70 [S070]\n   Price: Rs.3,859.41/unit | Qty: 500 units\n   Quality: Grade-B | Delivery: 21 days\n   Payment: advance_50 | Score: 0.188\n   Good overall deal"
+      }
+    ]
+  },
+  {
+    "scenario": "deadlock",
+    "status": "PASS",
+    "passed": true,
+    "summary": "All 0 negotiations failed due to 'price_floor_above_buyer_max'. Top deals returned: 0."
+  },
+  {
+    "scenario": "collusion",
+    "status": "FAIL",
+    "passed": false,
+    "summary": "Cartel sellers failed: 0/10. Honest sellers in top deals: 5/5. Buyer protected from price manipulation."
+  },
+  {
+    "scenario": "floor_breach",
+    "status": "PASS",
+    "passed": true,
+    "summary": "All 0 offers rejected. Floor price integrity maintained: True. No deal below \u20b95,000.00."
+  },
+  {
+    "scenario": "buyer_storm",
+    "status": "PASS",
+    "passed": true,
+    "summary": "20/20 buyers completed. 20 got deals. Total time: 0.02s. No starvation detected."
+  },
+  {
+    "scenario": "stale_inventory",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Stale seller rejected (insufficient_stock): True. Good seller deal reached: True."
+  },
+  {
+    "scenario": "moq_mismatch",
+    "status": "PASS",
+    "passed": true,
+    "summary": "All 5 sellers rejected due to MOQ mismatch. Buyer needs 50, all sellers require 500+."
+  },
+  {
+    "scenario": "payment_mismatch",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Payment mismatch scenario: Buyer wanted net_60, sellers only accept advance_100. 5/5 deals reached (buyer forced into advance terms). Human-in-the-loop can reject unfavorable terms."
+  },
+  {
+    "scenario": "single_monopoly",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Single seller scenario: 1 seller negotiated. Deal reached: True. Monopoly warning: buyer has no alternatives."
+  },
+  {
+    "scenario": "timeout",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Offline sellers skipped: 3. Online sellers negotiated: 3/3. Top deals: 3."
+  },
+  {
+    "scenario": "counter_spiral",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Spiral scenario: 3 negotiations completed (no hang). Deals reached: 3. Best-so-far fallback active."
+  },
+  {
+    "scenario": "quality_dispute",
+    "status": "PASS",
+    "passed": true,
+    "summary": "All 0 sellers rejected: quality grade B/C below buyer's minimum A. Top deals: 0."
+  },
+  {
+    "scenario": "seasonal_spike",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Seasonal spike: all 0 sellers priced above buyer max. Failure reasons: set(). Buyer should be advised to revisit budget or wait for prices to normalize."
+  },
+  {
+    "scenario": "gst_mismatch",
+    "status": "ERROR",
+    "error": "unexpected character after line continuation character (test_gst_mismatch.py, line 80)"
+  },
+  {
+    "scenario": "fake_msme",
+    "status": "PASS",
+    "passed": true,
+    "summary": "MSME validation: legit seller valid=True, fake seller caught=True (gstin_state_mismatch: GSTIN says Maharashtra, seller claims Gujarat)."
+  },
+  {
+    "scenario": "rapid_price_change",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Rapid price change: original floor \u20b94,000 \u2192 spiked to \u20b96,500 mid-negotiation. Deal reached: True, price: \u20b94,074.45. Above original floor: True. [Phase 2 will re-query floor each round to catch live changes.]"
+  },
+  {
+    "scenario": "partial_fulfillment",
+    "status": "FAIL",
+    "passed": false,
+    "summary": "Partial fulfillment: buyer needs 400 units. No single seller can supply all. Split order: 0 sellers covering 0 units. Feasible: False.",
+    "split_order": []
+  },
+  {
+    "scenario": "currency_rounding",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Rounding test: floor=\u20b94999.999999, max=\u20b95000.0. Deal: False, price=\u20b90.0. All rounding cases correct: True."
+  },
+  {
+    "scenario": "delivery_conflict",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Delivery in 5 days = 2026-03-14 (holiday/weekend). Adjusted to: 2026-03-16 (working day: True). Adjustment applied: True."
+  },
+  {
+    "scenario": "multi_category",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Multi-category: 3 parallel sub-agents ran. steel_raw: 5 deals (best \u20b95,574.45) | fabric_textile: 5 deals (best \u20b9914.89) | plastic_granules: 5 deals (best \u20b92,229.78)"
+  },
+  {
+    "scenario": "blacklist",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Blacklist enforcement: buyer blocked {'SBL003', 'SBL001'}. Seller SBL004 blocked buyer. Negotiated sellers: ['SBL000', 'SBL002', 'SBL005']. Buyer blacklist enforced: True. Seller blacklist enforced: True."
+  }
+]

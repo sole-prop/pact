@@ -1,0 +1,34 @@
+[
+  {
+    "scenario": "partial_fulfillment",
+    "status": "PASS",
+    "passed": true,
+    "summary": "Partial fulfillment: buyer needs 400 units. No single seller can supply all. Split order: 4 sellers covering 400 units. Feasible: True.",
+    "split_order": [
+      {
+        "seller_id": "SPF0",
+        "seller_name": "Partial Seller 0",
+        "allocated_qty": 100,
+        "price": 350.64
+      },
+      {
+        "seller_id": "SPF1",
+        "seller_name": "Partial Seller 1",
+        "allocated_qty": 100,
+        "price": 350.64
+      },
+      {
+        "seller_id": "SPF2",
+        "seller_name": "Partial Seller 2",
+        "allocated_qty": 100,
+        "price": 350.64
+      },
+      {
+        "seller_id": "SPF3",
+        "seller_name": "Partial Seller 3",
+        "allocated_qty": 100,
+        "price": 350.64
+      }
+    ]
+  }
+]

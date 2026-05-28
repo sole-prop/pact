@@ -1,0 +1,32 @@
+# ── Phase 1: Simulation Engine ────────────────────────────────────────────────
+pandas>=2.2.0
+openpyxl>=3.1.0
+rich>=13.7.0
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+
+# ── Phase 2: FastAPI Backend ──────────────────────────────────────────────────
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9        # file upload support
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+
+# ── Database ──────────────────────────────────────────────────────────────────
+supabase>=2.3.0
+
+# ── LLM / AI ─────────────────────────────────────────────────────────────────
+anthropic>=0.40.0              # Claude Haiku (optional, production only)
+httpx>=0.27.0                  # Async HTTP for Ollama + Sarvam + WhatsApp
+
+# ── Invoice Parsing ───────────────────────────────────────────────────────────
+pdfplumber>=0.10.0             # Digital PDF text extraction
+pymupdf>=1.23.0                # PDF → image for Tesseract OCR (fitz)
+Pillow>=10.0.0                 # Image processing for Tesseract
+# pytesseract>=0.3.10           # OCR (uncomment after: choco install tesseract)
+
+# ── Agent orchestration ───────────────────────────────────────────────────────
+# pyautogen>=0.4.0             # Optional: only if using AutoGen multi-agent
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0
