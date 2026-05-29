@@ -86,7 +86,7 @@ app = FastAPI(
 # ── CORS (restricted: read from env, default to localhost only) ───────────────
 # Set ALLOWED_ORIGINS env var for production (comma-separated).
 # Example: ALLOWED_ORIGINS=https://app.mycompany.com,https://staging.mycompany.com
-_allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000")
+_allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000,http://localhost:3000,http://127.0.0.1:3000")
 _allowed_origins = [o.strip() for o in _allowed_origins_raw.split(",") if o.strip()]
 
 app.add_middleware(
@@ -143,10 +143,12 @@ if _static_dir.exists():
 
 # ── Health endpoints ──────────────────────────────────────────────────────────
 
+from fastapi.responses import RedirectResponse
+
 @app.get("/dashboard", tags=["meta"], include_in_schema=False)
 async def dashboard():
-    """Serve the founder dashboard."""
-    return FileResponse(str(_static_dir / "dashboard.html"))
+    """Serve the founder dashboard by redirecting to the Next.js development server."""
+    return RedirectResponse(url="http://localhost:3000/dashboard")
 
 
 @app.get("/", tags=["meta"])

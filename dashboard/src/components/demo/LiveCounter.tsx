@@ -21,7 +21,6 @@ export function LiveCounter({
 }: LiveCounterProps) {
   const animatedTotal = useAnimatedNumber(total, 400);
 
-  // Format throughput nicely: e.g., 27000 -> 27.0K/s
   const formatThroughput = (val: number) => {
     if (val >= 1000) {
       return `${(val / 1000).toFixed(1)}K/s`;
@@ -29,7 +28,6 @@ export function LiveCounter({
     return `${val}/s`;
   };
 
-  // Format elapsed time nicely: e.g., 62 -> 1m 2s or 42.3 -> 42.3s
   const formatElapsed = (val: number) => {
     if (val >= 60) {
       const minutes = Math.floor(val / 60);
@@ -40,49 +38,53 @@ export function LiveCounter({
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center p-8 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] animate-fadeIn select-none">
+    <div className="relative flex flex-col items-center justify-center p-8 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none shadow-none animate-fadeIn select-none group">
+      {/* Decorative corners */}
+      <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-[#C5A880]/15" />
+      <div className="absolute bottom-2 right-2 w-1.5 h-1.5 border-b border-r border-[#C5A880]/15" />
+
       {/* Status Dot */}
-      <div className="absolute top-6 right-6 flex items-center gap-2">
+      <div className="absolute top-6 right-6 flex items-center gap-2 px-2.5 py-1 bg-[#070708] border border-[#1E1E1E]">
         <span
-          className={`w-1.5 h-1.5 rounded-full ${
+          className={`w-1.5 h-1.5 ${
             isRunning
               ? "bg-[#C5A880] animate-pulse"
               : isComplete
-              ? "bg-[#8E8675]/40"
-              : "bg-[#8E8675]/10"
+              ? "bg-[#807E78]/40"
+              : "bg-[#807E78]/10"
           }`}
         />
-        <span className="text-[10px] uppercase font-sans tracking-widest font-bold text-[#8E8675]">
+        <span className="text-[8px] uppercase font-mono tracking-widest font-bold text-[#807E78]">
           {isRunning ? "Running" : isComplete ? "Complete" : "Idle"}
         </span>
       </div>
 
       {/* Main Counter */}
-      <div className="text-center select-none py-4">
-        <span className="font-mono text-[90px] font-bold text-[#E5D3B3] tracking-tight tabular-nums leading-none" suppressHydrationWarning>
+      <div className="text-center select-none py-6">
+        <span className="font-mono text-[80px] font-extralight text-[#E5D3B3] tracking-tight tabular-nums leading-none" suppressHydrationWarning>
           {formatNumber(animatedTotal)}
         </span>
-        <div className="mt-2 text-[10px] uppercase font-sans tracking-[0.08em] text-[#8E8675] font-bold">
-          negotiations completed
+        <div className="mt-3 text-[9px] uppercase font-sans tracking-[0.18em] text-[#807E78] font-bold">
+          [ negotiations completed ]
         </div>
       </div>
 
       {/* Throughput and Time Row */}
-      <div className="w-full max-w-sm mt-4 border-t border-[#1C1812] pt-4 flex justify-around text-center">
+      <div className="w-full max-w-sm mt-4 border-t border-[#1E1E1E]/60 pt-4 flex justify-around text-center select-none">
         <div>
-          <div className="font-mono text-lg font-bold text-[#C5A880] tabular-nums">
+          <div className="font-mono text-base font-bold text-[#C5A880] tabular-nums">
             {formatThroughput(throughput)}
           </div>
-          <div className="text-[9px] uppercase font-sans tracking-[0.08em] text-[#4A4339] mt-0.5 font-bold">
+          <div className="text-[8px] uppercase font-sans tracking-[0.15em] text-[#48484A] mt-1.5 font-bold">
             Throughput
           </div>
         </div>
-        <div className="w-px bg-[#1C1812] self-stretch" />
+        <div className="w-px bg-[#1E1E1E]/60 self-stretch" />
         <div>
-          <div className="font-mono text-lg font-bold text-[#E5D3B3] tabular-nums">
+          <div className="font-mono text-base font-bold text-[#E5D3B3] tabular-nums">
             {formatElapsed(elapsed)}
           </div>
-          <div className="text-[9px] uppercase font-sans tracking-[0.08em] text-[#4A4339] mt-0.5 font-bold">
+          <div className="text-[8px] uppercase font-sans tracking-[0.15em] text-[#48484A] mt-1.5 font-bold">
             Elapsed Time
           </div>
         </div>

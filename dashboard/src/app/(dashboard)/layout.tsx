@@ -1,5 +1,6 @@
 import React from "react";
 import { Sidebar } from "@/components/Sidebar";
+import { Header } from "@/components/Header";
 
 export default function DashboardLayout({
   children,
@@ -7,15 +8,22 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex w-full h-screen overflow-hidden bg-[#030303] text-[#F2F2F7]">
-      {/* Fixed Sidebar navigation */}
+    <div className="flex w-full h-screen overflow-hidden bg-[var(--background-base)] text-[var(--text-primary)] font-sans">
+      {/* Fixed Sidebar navigation flush with left edge */}
       <Sidebar />
 
-      {/* Main page scrolling body */}
-      <main className="my-6 mr-6 ml-3 h-[calc(100vh-48px)] rounded-[6px] bg-[#0A0A0A] border border-[#1E1E1E] flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {/* Main content area with top header bar */}
+      <div className="h-screen flex-1 flex flex-col overflow-hidden">
+        {/* Persistent top bar: right-aligned header icons */}
+        <div className="flex items-center justify-end px-[var(--space-xl)] py-[var(--space-md)] border-b border-[var(--border-thin)] bg-[var(--background-surface)] shrink-0 z-20">
+          <Header />
+        </div>
+
+        {/* Scrollable page content */}
+        <main className="flex-1 overflow-y-auto bg-[var(--background-base)] relative scroll-smooth z-10">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
-

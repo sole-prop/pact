@@ -1,8 +1,0 @@
-[
-  {
-    "scenario": "collusion",
-    "status": "PASS",
-    "passed": true,
-    "summary": "Cartel sellers pre-filtered (floor Rs.12,000 > buyer max Rs.10,000): excluded=True. Honest sellers in top deals: 5/5. Buyer protected from price manipulation."
-  }
-]

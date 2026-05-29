@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { LatestReport } from "@/types/pact";
+import { Surface, DashboardPanel } from "@/components/ui/SovereignPrimitives";
 
 interface StrategyLeaderboardProps {
   report: LatestReport | null;
@@ -40,9 +42,7 @@ const STRATEGIES_LIST = [
 
 export function StrategyLeaderboard({ report }: StrategyLeaderboardProps) {
   const [activeKey, setActiveKey] = useState("tit_for_tat");
-  const isLoading = !report;
 
-  // Static mock stats that align perfectly with the screenshot values if no report exists yet
   const getMockStats = (key: string) => {
     switch (key) {
       case "tit_for_tat": return { success: 74.2, savings: 24.0 };
@@ -59,22 +59,19 @@ export function StrategyLeaderboard({ report }: StrategyLeaderboardProps) {
   const activeSuccess = activeStats ? activeStats.success_pct : activeMock.success;
   const activeSavings = activeStats ? activeStats.avg_savings_pct : activeMock.savings;
 
-  return (
-    <div className="flex flex-col bg-[#0C0C0C]/40 border border-white/[0.06] rounded-xl p-6 gap-6 relative overflow-hidden group select-none">
-      <div className="flex justify-between items-center border-b border-white/[0.04] pb-3 select-none">
-        <span className="text-[11px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
-          Strategy Performance Matrix
-        </span>
-        <span className="font-mono text-[9px] text-[#C5A880] uppercase tracking-widest bg-[#14120F] border border-[#C5A880]/15 rounded-[4px] px-2 py-0.5 font-bold">
-          ACTIVE DECK
-        </span>
-      </div>
+  const headerRight = (
+    <span className="font-mono text-[8px] text-[var(--accent-gold)] uppercase tracking-widest bg-[var(--background-base)] border border-[var(--accent-gold)]/[0.15] rounded-none px-[var(--space-sm)] py-[var(--space-xs)] font-bold">
+      Active Deck
+    </span>
+  );
 
+  return (
+    <DashboardPanel title="Strategy Performance Matrix" headerRight={headerRight}>
       {/* Main Asymmetric Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-[var(--space-md)] items-start">
         
         {/* Left Column: Strategy List */}
-        <div className="md:col-span-6 flex flex-col gap-3">
+        <div className="md:col-span-6 flex flex-col gap-[var(--space-sm)]">
           {STRATEGIES_LIST.map((strat) => {
             const stats = report?.by_strategy?.[strat.key];
             const mock = getMockStats(strat.key);
@@ -82,99 +79,114 @@ export function StrategyLeaderboard({ report }: StrategyLeaderboardProps) {
             const isSelected = activeKey === strat.key;
 
             return (
-              <div
+              <Surface
                 key={strat.key}
                 onClick={() => setActiveKey(strat.key)}
-                className={`flex flex-col p-3.5 rounded-lg border cursor-pointer transition-all duration-300 select-none ${
-                  isSelected
-                    ? "bg-[#14120F] border-[#C5A880]/40 shadow-[0_2px_12px_rgba(197,168,128,0.05)]"
-                    : "bg-[#0A0A0C]/40 border-white/[0.04] hover:border-white/[0.1] hover:bg-[#0A0A0C]/80"
-                }`}
+                active={isSelected}
+                className="p-[var(--space-md)] cursor-pointer select-none"
               >
+                {isSelected && (
+                  <motion.div 
+                    layoutId="activeIndicator"
+                    className="absolute left-0 top-0 bottom-0 w-[2px] bg-[var(--accent-gold)]" 
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+                  />
+                )}
+
                 <div className="flex justify-between items-baseline">
-                  <span className={`text-[11px] font-sans font-extrabold uppercase tracking-wide ${
-                    isSelected ? "text-[#C5A880]" : "text-[#E5D3B3]"
+                  <span className={`text-[9.5px] font-mono font-bold uppercase tracking-widest ${
+                    isSelected ? "text-[var(--accent-gold)]" : "text-[var(--accent-cream)]"
                   }`}>
                     {strat.label.split(" ")[0]}
                   </span>
-                  <span className="font-mono text-[11px] font-extrabold text-[#E5D3B3] tabular-nums">
+                  <span className="font-mono text-[11px] font-bold text-white tabular-nums">
                     {successPct.toFixed(1)}%
                   </span>
                 </div>
 
-                {/* Progress bar heightened from 2.5px to 4px */}
-                <div className="w-full h-[4px] bg-[#111111] rounded-full mt-2.5 overflow-hidden">
+                {/* Flat Square Progress bar */}
+                <div className="w-full h-[3px] bg-[var(--background-base)] border border-[var(--border-thin)] mt-[var(--space-sm)] overflow-hidden p-[0.5px] rounded-none">
                   <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      isSelected ? "bg-[#C5A880]" : "bg-white/[0.1]"
+                    className={`h-full transition-all duration-500 ${
+                      isSelected ? "bg-[var(--accent-gold)]" : "bg-white/[0.04]"
                     }`}
                     style={{ width: `${successPct}%` }}
                   />
                 </div>
-              </div>
+              </Surface>
             );
           })}
         </div>
 
-        {/* Right Column: Diagnostic Telemetry with increased padding and text sizes */}
-        <div className="md:col-span-6 bg-[#0A0A0C] border border-white/[0.06] rounded-xl p-5.5 flex flex-col gap-4 relative overflow-hidden min-h-[195px] justify-between">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-[#C5A880]/[0.01] rounded-full blur-2xl pointer-events-none" />
+        {/* Right Column: Diagnostic Telemetry with smooth opacity reveals */}
+        <DashboardPanel className="md:col-span-6 bg-[var(--background-base)] min-h-[240px] justify-between">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--accent-gold)]/[0.01] rounded-full blur-2xl pointer-events-none" />
 
           {/* Subpanel Header */}
-          <div className="flex flex-col gap-1.5 border-b border-white/[0.04] pb-2">
-            <span className="text-[9px] font-mono uppercase tracking-widest text-[#8E8E93] font-bold">
-              DIAGNOSTIC TELEMETRY
+          <div className="flex flex-col gap-[var(--space-xs)] border-b border-[var(--border-thin)] pb-[var(--space-sm)]">
+            <span className="text-[8px] font-mono uppercase tracking-widest text-[var(--text-secondary)] font-bold">
+              [Diagnostic Telemetry]
             </span>
-            <span className="text-[12px] font-sans font-extrabold uppercase text-[#E5D3B3] tracking-wide">
+            <span className="text-[11px] font-sans font-extrabold uppercase text-[var(--text-primary)] tracking-widest">
               {activeStrategy.label}
             </span>
           </div>
 
-          {/* Strategy Details Block */}
-          <p className="text-[11px] font-sans text-[#8E8E93] leading-relaxed italic">
-            &quot;{activeStrategy.desc}&quot;
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeKey}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col gap-[var(--space-lg)] flex-1 justify-between"
+            >
+              {/* Strategy Details Block */}
+              <p className="text-[10px] font-sans text-[var(--text-secondary)] leading-relaxed uppercase tracking-wider font-semibold">
+                {activeStrategy.desc}
+              </p>
 
-          {/* Metric Grid with increased sizes to 10px labels and 13px values */}
-          <div className="grid grid-cols-2 gap-3.5 pt-1.5 font-mono text-[10px]">
-            <div className="flex flex-col gap-1 border-r border-white/[0.04] pr-2">
-              <span className="text-[#8E8E93] uppercase tracking-wider font-extrabold text-[8.5px]">AVG SAVINGS</span>
-              <span className="text-[13px] font-extrabold text-[#C5A880] tabular-nums">
-                {activeSavings.toFixed(1)}%
-              </span>
-            </div>
+              {/* Metric Sub-Grid */}
+              <div className="grid grid-cols-2 gap-[var(--space-md)] pt-[var(--space-sm)] font-mono text-[9px] border-t border-[var(--border-thin)]">
+                <div className="flex flex-col gap-[var(--space-xs)]">
+                  <span className="text-[var(--text-secondary)] uppercase tracking-wider font-bold text-[8px] font-mono">[Avg Savings]</span>
+                  <span className="text-[12px] font-bold text-[var(--accent-gold)] tabular-nums">
+                    {activeSavings.toFixed(1)}%
+                  </span>
+                </div>
 
-            <div className="flex flex-col gap-1 pl-2">
-              <span className="text-[#8E8E93] uppercase tracking-wider font-extrabold text-[8.5px]">COMPROMISE ROUNDS</span>
-              <span className="text-[13px] font-extrabold text-[#E5D3B3] tabular-nums">
-                {activeStrategy.rounds} Rounds
-              </span>
-            </div>
+                <div className="flex flex-col gap-[var(--space-xs)] pl-[var(--space-md)] border-l border-[var(--border-thin)]">
+                  <span className="text-[var(--text-secondary)] uppercase tracking-wider font-bold text-[8px] font-mono">[Compromise Rounds]</span>
+                  <span className="text-[12px] font-bold text-[var(--accent-cream)] tabular-nums">
+                    {activeStrategy.rounds} Rounds
+                  </span>
+                </div>
 
-            <div className="flex flex-col gap-1 border-r border-white/[0.04] pr-2 pt-2 border-t border-white/[0.04]">
-              <span className="text-[#8E8E93] uppercase tracking-wider font-extrabold text-[8.5px]">AGGRESSION</span>
-              <span className={`font-extrabold uppercase tracking-widest ${
-                activeStrategy.aggressiveness === "HIGH" || activeStrategy.aggressiveness === "EXTREME"
-                  ? "text-red-400"
-                  : activeStrategy.aggressiveness === "MEDIUM"
-                  ? "text-[#C5A880]"
-                  : "text-green-400"
-              }`}>
-                {activeStrategy.aggressiveness}
-              </span>
-            </div>
+                <div className="flex flex-col gap-[var(--space-xs)] pt-[var(--space-sm)] border-t border-[var(--border-thin)]">
+                  <span className="text-[var(--text-secondary)] uppercase tracking-wider font-bold text-[8px] font-mono">[Aggression]</span>
+                  <span className={`font-bold uppercase tracking-widest text-[10px] ${
+                    activeStrategy.aggressiveness === "HIGH" || activeStrategy.aggressiveness === "EXTREME"
+                      ? "text-red-400"
+                      : activeStrategy.aggressiveness === "MEDIUM"
+                      ? "text-[var(--accent-gold)]"
+                      : "text-green-400"
+                  }`}>
+                    {activeStrategy.aggressiveness}
+                  </span>
+                </div>
 
-            <div className="flex flex-col gap-1 pl-2 pt-2 border-t border-white/[0.04]">
-              <span className="text-[#8E8E93] uppercase tracking-wider font-extrabold text-[8.5px]">STABILITY</span>
-              <span className="text-green-400 font-black tracking-widest text-[9.5px]">
-                OPTIMAL
-              </span>
-            </div>
-          </div>
-        </div>
+                <div className="flex flex-col gap-[var(--space-xs)] pl-[var(--space-md)] pt-[var(--space-sm)] border-l border-[var(--border-thin)] border-t border-[var(--border-thin)]">
+                  <span className="text-[var(--text-secondary)] uppercase tracking-wider font-bold text-[8px] font-mono">[Stability]</span>
+                  <span className="text-green-400 font-bold tracking-widest text-[10px]">
+                    OPTIMAL
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </DashboardPanel>
 
       </div>
-    </div>
+    </DashboardPanel>
   );
 }
-

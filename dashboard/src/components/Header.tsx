@@ -5,22 +5,22 @@ import { Bell, Shield } from "lucide-react";
 
 export function Header() {
   return (
-    <div className="flex items-center gap-4 select-none">
-      {/* Golden Bell Icon */}
-      <button className="p-1.5 text-[#8E8675] hover:text-[#C5A880] transition-colors cursor-pointer relative">
-        <Bell className="w-4 h-4 text-[#C5A880]" />
-        {/* Subtle ping dot */}
-        <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#C5A880] animate-pulse" />
+    <div className="flex items-center gap-[var(--space-md)] select-none font-sans">
+      {/* Alert Sentinel Telemetry Trigger */}
+      <button className="p-[var(--space-sm)] text-[var(--text-secondary)] hover:text-[var(--accent-gold)] transition-colors cursor-pointer relative bg-[var(--background-surface)] border border-[var(--border-thin)] flex items-center justify-center rounded-none">
+        <Bell className="w-3.5 h-3.5 text-[var(--accent-gold)]" />
+        {/* Fine rectangular telemetry tag indicator */}
+        <span className="absolute -top-1 -right-1 w-2 h-2 bg-[var(--accent-gold)] border border-[var(--background-base)] rounded-none" />
       </button>
 
-      {/* Red Shield Sentinel Icon */}
-      <button className="p-1.5 text-[#8E8675] hover:text-red-400 transition-colors cursor-pointer">
-        <Shield className="w-4 h-4 text-[#FF453A]" fill="#FF453A" fillOpacity="0.15" />
+      {/* Red Shield Security Telemetry Trigger */}
+      <button className="p-[var(--space-sm)] text-[var(--text-secondary)] hover:text-red-400 transition-colors cursor-pointer bg-[var(--background-surface)] border border-[var(--border-thin)] flex items-center justify-center rounded-none">
+        <Shield className="w-3.5 h-3.5 text-[#FF453A]" fill="#FF453A" fillOpacity="0.1" />
       </button>
 
-      {/* Circle "N" Initials Avatar */}
-      <div className="w-6 h-6 rounded-full bg-[#0C0C0C] border border-[#1C1812] flex items-center justify-center font-sans text-[9px] font-bold text-[#E5D3B3] cursor-pointer hover:border-[#C5A880] transition-colors">
-        N
+      {/* Initials Avatar */}
+      <div className="w-7 h-7 bg-[var(--background-surface)] border border-[var(--border-thin)] flex items-center justify-center font-mono text-[9px] font-bold text-[var(--accent-cream)] cursor-pointer hover:border-[var(--accent-gold)] transition-all rounded-none">
+        A
       </div>
     </div>
   );

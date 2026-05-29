@@ -31,8 +31,8 @@ export function ProgressionChart({ snapshots }: ProgressionChartProps) {
 
   if (!isMounted) {
     return (
-      <div className="h-[320px] bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] flex items-center justify-center select-none">
-        <span className="text-[10px] font-sans uppercase tracking-widest text-[#C5A880] font-bold animate-pulse">
+      <div className="h-[320px] bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex items-center justify-center select-none">
+        <span className="text-[9px] font-sans uppercase tracking-[0.18em] text-[#C5A880] font-bold animate-pulse">
           Loading chart engine...
         </span>
       </div>
@@ -41,30 +41,30 @@ export function ProgressionChart({ snapshots }: ProgressionChartProps) {
 
   if (snapshots.length < 2) {
     return (
-      <div className="h-[320px] bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] flex items-center justify-center flex-col p-6 text-center select-none shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
-        <span className="text-[10px] font-sans uppercase tracking-[0.08em] text-[#4A4339] font-bold">
+      <div className="h-[320px] bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex items-center justify-center flex-col p-6 text-center select-none relative group">
+        <div className="absolute top-2 left-2 w-1 h-1 border-t border-l border-[#C5A880]/15" />
+        <span className="text-[9px] font-sans uppercase tracking-[0.15em] text-[#48484A] font-bold">
           Waiting for live telemetry...
         </span>
-        <span className="text-[9px] font-mono text-[#4A4339] mt-1 font-semibold">
+        <span className="text-[8px] font-mono text-[#48484A] mt-2 font-bold uppercase tracking-widest">
           TELEMETRY SNAPSHOTS TRIGGER EVERY 5S
         </span>
       </div>
     );
   }
 
-  // Custom tooltips matching Bloomberg dark aesthetics
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload as Snapshot;
       return (
-        <div className="bg-[#0C0C0C] border border-[#1C1812] p-3 rounded-[4px] shadow-lg text-left select-none font-mono">
-          <p className="text-[9px] uppercase tracking-wider text-[#8E8675] mb-1">
+        <div className="bg-[#0D0D0E] border border-[#1E1E1E] p-3 rounded-none shadow-2xl text-left select-none font-mono">
+          <p className="text-[8px] uppercase tracking-widest text-[#807E78] mb-1 font-bold">
             Time: {data.elapsed.toFixed(1)}s
           </p>
           {payload.map((item: any, idx: number) => (
             <p
               key={idx}
-              className="text-[11px] font-bold"
+              className="text-[10px] font-bold"
               style={{ color: item.color || "#E5D3B3" }}
               suppressHydrationWarning
             >
@@ -79,9 +79,11 @@ export function ProgressionChart({ snapshots }: ProgressionChartProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] select-none">
+    <div className="flex flex-col gap-6 p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none shadow-none select-none relative group">
+      <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-[#C5A880]/15 animate-pulse" />
+      
       <div>
-        <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-2">
+        <div className="text-[9px] font-sans font-bold uppercase tracking-[0.18em] text-[#807E78] mb-3">
           Throughput Velocity (K/sec)
         </div>
         <div className="h-[120px] w-full">
@@ -93,15 +95,15 @@ export function ProgressionChart({ snapshots }: ProgressionChartProps) {
               <XAxis
                 dataKey="elapsed"
                 tickFormatter={(val) => `${val}s`}
-                stroke="#4A4339"
-                fontSize={9}
+                stroke="#48484A"
+                fontSize={8}
                 fontFamily="var(--font-geist-mono)"
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="#4A4339"
-                fontSize={9}
+                stroke="#48484A"
+                fontSize={8}
                 fontFamily="var(--font-geist-mono)"
                 tickLine={false}
                 axisLine={false}
@@ -113,7 +115,7 @@ export function ProgressionChart({ snapshots }: ProgressionChartProps) {
                 dataKey="throughput"
                 name="Throughput"
                 stroke="#C5A880"
-                strokeWidth={1.5}
+                strokeWidth={1.2}
                 dot={false}
               />
             </LineChart>
@@ -121,8 +123,8 @@ export function ProgressionChart({ snapshots }: ProgressionChartProps) {
         </div>
       </div>
 
-      <div className="border-t border-[#1C1812] pt-4">
-        <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-2">
+      <div className="border-t border-[#1E1E1E]/60 pt-4">
+        <div className="text-[9px] font-sans font-bold uppercase tracking-[0.18em] text-[#807E78] mb-3">
           Average Negotiated Savings (%)
         </div>
         <div className="h-[120px] w-full">
@@ -134,15 +136,15 @@ export function ProgressionChart({ snapshots }: ProgressionChartProps) {
               <XAxis
                 dataKey="elapsed"
                 tickFormatter={(val) => `${val}s`}
-                stroke="#4A4339"
-                fontSize={9}
+                stroke="#48484A"
+                fontSize={8}
                 fontFamily="var(--font-geist-mono)"
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="#4A4339"
-                fontSize={9}
+                stroke="#48484A"
+                fontSize={8}
                 fontFamily="var(--font-geist-mono)"
                 tickLine={false}
                 axisLine={false}
@@ -154,7 +156,7 @@ export function ProgressionChart({ snapshots }: ProgressionChartProps) {
                 dataKey="avg_savings"
                 name="Savings Rate"
                 stroke="#E5D3B3"
-                strokeWidth={1.5}
+                strokeWidth={1.2}
                 dot={false}
               />
             </LineChart>

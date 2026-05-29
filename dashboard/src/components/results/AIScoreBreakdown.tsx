@@ -24,7 +24,7 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
 
   if (!deal) {
     return (
-      <div className="h-[480px] bg-[#111111] border border-[#1E1E1E] rounded-[6px] flex flex-col items-center justify-center p-6 text-center select-none shadow-2xl relative overflow-hidden group">
+      <div className="h-[480px] bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col items-center justify-center p-6 text-center select-none relative overflow-hidden group">
         {/* Subtle Ambient Corner Glow */}
         <div className="absolute top-0 right-0 w-36 h-36 bg-[#C5A880]/[0.02] rounded-full blur-[80px]" />
         
@@ -34,8 +34,8 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
         <div className="absolute bottom-4 left-4 w-2 h-2 border-b border-l border-[#C5A880]/15" />
         <div className="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-[#C5A880]/15" />
 
-        <span className="text-[10px] font-sans uppercase tracking-[0.12em] text-[#48484A] font-bold">
-          SELECT A CONTENDER TO INITIALIZE SCORING ANALYZER
+        <span className="text-[9px] font-sans uppercase tracking-[0.15em] text-[#48484A] font-bold">
+          [ SELECT A CONTENDER TO INITIALIZE SCORING ANALYZER ]
         </span>
       </div>
     );
@@ -66,22 +66,17 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
     { label: "Reliability score", value: reliabilityScore, weight: 0.05 },
   ];
 
-  // Calculate composite rating deviation vs baseline priority (average priority is ~80)
   const averagePriority = 80;
   const averageContender = (priceScore + deliveryScore + qualityScore + termsScore + reliabilityScore) / 5;
   const scoreDeviation = averageContender - averagePriority;
 
   return (
-    <div className="flex flex-col bg-[#111111] border border-[#1E1E1E] hover:border-[#C5A880]/15 rounded-[6px] shadow-2xl p-6 gap-6 relative overflow-hidden transition-all duration-300 group">
+    <div className="flex flex-col bg-[#0D0D0E] border border-[#1E1E1E] hover:border-[#C5A880]/15 rounded-none p-6 gap-6 relative overflow-hidden transition-all duration-300 group">
       {/* Background sweep effects */}
       <style>{`
         @keyframes radar-sweep-spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
-        }
-        @keyframes active-pulse {
-          0%, 100% { opacity: 0.25; }
-          50% { opacity: 0.5; }
         }
       `}</style>
 
@@ -95,19 +90,19 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
       <div className="absolute bottom-4 right-4 w-1.5 h-1.5 border-b border-r border-[#C5A880]/20" />
 
       {/* Header Info Panel */}
-      <div className="flex justify-between items-start z-10">
+      <div className="flex justify-between items-start z-10 select-none">
         <div className="flex flex-col gap-1">
-          <span className="text-[9px] font-sans font-bold uppercase tracking-[0.15em] text-[#8E8E93]">
+          <span className="text-[8.5px] font-sans font-bold uppercase tracking-[0.18em] text-[#807E78]">
             Operational Metrics
           </span>
-          <h2 className="text-[12px] font-sans font-extrabold uppercase tracking-[0.08em] text-[#E5D3B3] truncate max-w-[200px]">
+          <h2 className="text-[11.5px] font-sans font-extrabold uppercase tracking-widest text-[#E5D3B3] truncate max-w-[200px]">
             {deal.seller_name}
           </h2>
         </div>
 
         {/* Live HUD Status Pill */}
-        <div className="flex items-center gap-1.5 font-mono text-[8px] font-bold text-[#C5A880] bg-[#14120F] border border-[#C5A880]/20 rounded-[4px] px-2 py-0.5 select-none shadow-[inset_0_1px_0_rgba(197,168,128,0.05)]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880] animate-pulse" />
+        <div className="flex items-center gap-1.5 font-mono text-[8px] font-bold text-[#C5A880] bg-[#070708] border border-[#C5A880]/20 rounded-none px-2.5 py-1 select-none shadow-[inset_0_1px_0_rgba(197,168,128,0.05)]">
+          <span className="w-1.5 h-1.5 bg-[#C5A880] animate-pulse" />
           <span>DEV: {scoreDeviation >= 0 ? "+" : ""}{scoreDeviation.toFixed(1)}%</span>
         </div>
       </div>
@@ -116,16 +111,15 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
       <div className="h-[210px] w-full flex items-center justify-center relative select-none">
         
         {/* Circular Scanning sweeps behind the Radar chart */}
-        <div className="absolute w-[156px] h-[156px] rounded-full border border-[#C5A880]/5 flex items-center justify-center pointer-events-none">
-          {/* Inner concentric ring */}
-          <div className="w-[104px] h-[104px] rounded-full border border-[#C5A880]/5 flex items-center justify-center">
-            {/* Innermost ring */}
-            <div className="w-[52px] h-[52px] rounded-full border border-[#C5A880]/3" />
+        <div className="absolute w-[156px] h-[156px] rounded-none border border-[#C5A880]/5 flex items-center justify-center pointer-events-none">
+          {/* Inner concentric rings */}
+          <div className="w-[104px] h-[104px] rounded-none border border-[#C5A880]/5 flex items-center justify-center">
+            <div className="w-[52px] h-[52px] rounded-none border border-[#C5A880]/3" />
           </div>
 
           {/* Sweeper beam */}
           <div 
-            className="absolute inset-0 rounded-full pointer-events-none"
+            className="absolute inset-0 rounded-none pointer-events-none"
             style={{
               background: "conic-gradient(from 0deg, transparent 50%, rgba(197, 168, 128, 0.01) 85%, rgba(197, 168, 128, 0.05) 100%)",
               animation: "radar-sweep-spin 10s linear infinite",
@@ -134,12 +128,11 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
         </div>
 
         {/* Central Pulse Ambient */}
-        <div className="absolute w-20 h-20 bg-[#C5A880]/[0.03] rounded-full blur-xl pointer-events-none" />
+        <div className="absolute w-20 h-20 bg-[#C5A880]/[0.03] rounded-none blur-xl pointer-events-none" />
 
         {isMounted ? (
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="75%" data={chartData}>
-              {/* Custom SVG Definitions */}
               <defs>
                 <radialGradient id="radarGlow" cx="50%" cy="50%" r="50%">
                   <stop offset="0%" stopColor="#C5A880" stopOpacity="0.25" />
@@ -162,8 +155,8 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
               
               <PolarAngleAxis
                 dataKey="subject"
-                stroke="#8E8E93"
-                fontSize={9}
+                stroke="#807E78"
+                fontSize={8.5}
                 fontFamily="var(--font-geist-sans)"
                 tickLine={false}
                 dy={3}
@@ -172,7 +165,7 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
                     x={x}
                     y={y}
                     textAnchor={textAnchor}
-                    className="font-sans font-bold uppercase tracking-[0.1em] text-[8.5px] fill-[#8E8E93]"
+                    className="font-sans font-bold uppercase tracking-widest text-[8px] fill-[#807E78]"
                   >
                     {payload.value}
                   </text>
@@ -186,29 +179,27 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
                 axisLine={false} 
               />
               
-              {/* Contender radar shape - Custom gradient glowing core */}
               <Radar
                 name="Top Contender"
                 dataKey="contender"
                 stroke="url(#goldStroke)"
-                strokeWidth={1.5}
+                strokeWidth={1.2}
                 fill="url(#radarGlow)"
                 fillOpacity={1}
               />
               
-              {/* Buyer priority radar shape - Dotted Amber Border */}
               <Radar
                 name="Your Priorities"
                 dataKey="priority"
                 stroke="#48484A"
                 strokeDasharray="4 4"
-                strokeWidth={1}
+                strokeWidth={0.8}
                 fill="none"
               />
             </RadarChart>
           </ResponsiveContainer>
         ) : (
-          <span className="text-[10px] font-sans uppercase text-[#48484A] font-bold">
+          <span className="text-[9px] font-sans uppercase text-[#48484A] font-bold">
             LOADING SCORING ENGINE...
           </span>
         )}
@@ -216,35 +207,35 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
 
       {/* Instrument Legend */}
       <div className="flex justify-center gap-6 select-none border-b border-[#1E1E1E] pb-5">
-        <div className="flex items-center gap-2 text-[10px] font-mono text-[#8E8E93]">
-          <span className="w-3 h-0.5 bg-[#C5A880] rounded-full" />
-          <span className="uppercase tracking-wider">Top Contender</span>
+        <div className="flex items-center gap-2 text-[9px] font-mono text-[#807E78] font-bold">
+          <span className="w-3 h-0.5 bg-[#C5A880] rounded-none" />
+          <span className="uppercase tracking-widest">[ Top Contender ]</span>
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-mono text-[#8E8E93]">
+        <div className="flex items-center gap-2 text-[9px] font-mono text-[#807E78] font-bold">
           <span className="w-3 h-0.5 border-t border-dashed border-[#48484A]" />
-          <span className="uppercase tracking-wider">Your Priorities</span>
+          <span className="uppercase tracking-widest">[ Your Priorities ]</span>
         </div>
       </div>
 
-      {/* Stacked Instrument Bar Grid (Sleek and Modern) */}
+      {/* Stacked Instrument Bar Grid */}
       <div className="flex flex-col gap-4">
         {breakdownRows.map((row, idx) => {
-          const barWidth = row.value; // progress %
+          const barWidth = row.value;
           return (
             <div key={idx} className="flex flex-col gap-1.5 group/bar">
               <div className="flex justify-between items-baseline">
-                <span className="text-[10px] font-sans font-bold text-[#8E8E93] uppercase tracking-wider group-hover/bar:text-[#E5D3B3] transition-colors">
+                <span className="text-[9.5px] font-sans font-bold text-[#807E78] uppercase tracking-widest group-hover/bar:text-[#E5D3B3] transition-colors">
                   {row.label}
                 </span>
-                <span className="font-mono text-[10.5px] font-bold text-[#E5D3B3] tabular-nums">
-                  {row.value}<span className="text-[#48484A] text-[9px] font-sans">/100</span>
+                <span className="font-mono text-[10px] font-bold text-[#E5D3B3] tabular-nums">
+                  {row.value}<span className="text-[#48484A] text-[8.5px] font-sans font-bold">/100</span>
                 </span>
               </div>
               
               {/* Ultra-premium compound progress rail */}
-              <div className="w-full h-1 bg-[#111111] border border-[#1E1E1E] rounded-full p-[0.5px] overflow-hidden">
+              <div className="w-full h-1 bg-[#070708] border border-[#1E1E1E] rounded-none p-[0.5px] overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-[#9C7F57] to-[#C5A880] rounded-full transition-all duration-700 ease-out"
+                  className="h-full bg-gradient-to-r from-[#9C7F57] to-[#C5A880] rounded-none transition-all duration-700 ease-out"
                   style={{ width: `${barWidth}%` }}
                 />
               </div>
@@ -255,4 +246,3 @@ export function AIScoreBreakdown({ deal }: AIScoreBreakdownProps) {
     </div>
   );
 }
-

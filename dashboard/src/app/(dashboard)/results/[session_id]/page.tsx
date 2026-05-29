@@ -66,17 +66,17 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto w-full p-8 md:p-10 flex flex-col gap-8 select-none">
+    <div className="max-w-5xl mx-auto w-full p-8 md:p-10 flex flex-col gap-8 select-none font-sans">
       
       {/* Header telemetry row (Spacious separation) */}
-      <div className="flex justify-between items-center border-b border-white/[0.04] pb-6 mb-2 select-none">
+      <div className="flex justify-between items-center border-b border-[#1E1E1E] pb-6 mb-2 select-none">
         <Link
           href="/negotiate"
-          className="text-[10px] font-sans font-bold uppercase tracking-[0.15em] text-[#8E8E93] hover:text-[#C5A880] transition-colors"
+          className="text-[9.5px] font-sans font-bold uppercase tracking-[0.2em] text-[#807E78] hover:text-[#C5A880] transition-colors"
         >
           ← NEW REQUEST
         </Link>
-        <div className="font-mono text-[8.5px] text-[#8E8E93] uppercase tracking-wider bg-[#14120F] border border-white/[0.04] rounded-[4px] px-2.5 py-1 select-none hidden md:block shadow-sm">
+        <div className="font-mono text-[8px] text-[#807E78] uppercase tracking-widest bg-[#0D0D0E] border border-[#1E1E1E] rounded-none px-3 py-1 select-none hidden md:block shadow-sm font-bold">
           {data.deals_found} DEALS FOUND · {data.sellers_queried} SELLERS QUERIED · <span className="text-[#C5A880]">{(data.duration_seconds * 1000).toFixed(0)}MS LATENCY</span>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function ResultsPage() {
         
         {/* Shortlist Table Column (58% / 7 cols) */}
         <div className="lg:col-span-7 flex flex-col gap-5">
-          <div className="text-[10px] font-sans font-bold uppercase tracking-[0.12em] text-[#8E8E93] px-1 select-none">
+          <div className="text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] px-1 select-none">
             TOP SHORTLIST CONTENDERS
           </div>
           <TopContendersTable
@@ -107,7 +107,7 @@ export default function ResultsPage() {
           {selectedDeal && (
             <button
               onClick={() => setDealToConfirm(selectedDeal)}
-              className="w-full py-4 text-center text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-[#050505] bg-[#C5A880] hover:bg-[#E5D3B3] rounded-lg transition-all duration-300 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 select-none shadow-[0_4px_20px_rgba(197,168,128,0.15)]"
+              className="w-full py-4 text-center text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-[#070708] bg-[#C5A880] hover:bg-[#E5D3B3] rounded-none transition-all duration-300 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 select-none font-bold"
             >
               🔒 Accept Selection & Initiate Escrow
             </button>
