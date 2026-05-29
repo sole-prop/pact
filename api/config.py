@@ -66,6 +66,17 @@ class Settings(BaseSettings):
     # ── WhatsApp security ─────────────────────────────────────────────────
     WHATSAPP_APP_SECRET: str = ""   # App secret for X-Hub-Signature-256 validation
 
+    # ── Redis (distributed cache, Phase 2) ───────────────────────────────
+    REDIS_HOST: str = "127.0.0.1"
+    REDIS_PORT: int = 6379
+    REDIS_PASSWORD: str = ""
+    REDIS_DB: int = 0
+    USE_REDIS_MOCK: bool = True
+
+    # ── Event Streams (Phase 2.5) ────────────────────────────────────────
+    KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
+    USE_KAFKA_MOCK: bool = True
+
     # ── Negotiation defaults ─────────────────────────────────────────────
     MAX_NEGOTIATION_ROUNDS: int = 5
     MAX_CONCURRENT_NEGOTIATIONS: int = 100

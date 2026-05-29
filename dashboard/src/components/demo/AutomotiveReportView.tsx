@@ -56,7 +56,6 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
 
   const loc = (n: number) => formatNumber(n);
 
-  // Formatting helpers
   const formatINR = (val: number) => {
     const crores = val / 10000000;
     const formatted = crores.toFixed(2);
@@ -69,12 +68,12 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
     switch (severity.toLowerCase()) {
       case "high":
       case "critical":
-        return "text-[#C5A880] border-[#1C1812] bg-[#060606]";
+        return "text-[#C5A880] border-[#1E1E1E] bg-[#070708]";
       case "medium":
       case "warning":
-        return "text-[#E5D3B3] border-[#1C1812] bg-[#060606]";
+        return "text-[#E5D3B3] border-[#1E1E1E] bg-[#070708]";
       default:
-        return "text-[#8E8675] border-[#1C1812] bg-[#060606]";
+        return "text-[#807E78] border-[#1E1E1E] bg-[#070708]";
     }
   };
 
@@ -84,102 +83,107 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
     (meta.duration_secs > 0 ? Math.round(summary.total_negotiations / meta.duration_secs) : 0);
 
   return (
-    <div className="flex flex-col gap-6 w-full animate-fadeIn select-none">
+    <div className="flex flex-col gap-6 w-full animate-fadeIn select-none font-sans">
       
       {/* SECTION 1: HIGH-DENSITY HEADLINE KPIS */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         
         {/* KPI 1: THROUGHPUT VELOCITY */}
-        <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col justify-between select-none">
-          <span className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675]">
+        <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col justify-between select-none relative group">
+          <div className="absolute top-1 left-1 w-1 h-1 border-t border-l border-[#C5A880]/15 group-hover:border-[#C5A880]/30 transition-colors" />
+          <span className="text-[9px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78]">
             Throughput Velocity
           </span>
           <div className="my-2">
-            <span className="font-mono text-3xl font-bold text-[#E5D3B3] tabular-nums" suppressHydrationWarning>
+            <span className="font-mono text-2xl font-light text-[#E5D3B3] tabular-nums" suppressHydrationWarning>
               {loc(throughput)}
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-wide text-[#8E8675] block mt-0.5 font-bold">
+            <span className="font-mono text-[8px] uppercase tracking-widest text-[#807E78] block mt-1 font-bold">
               negotiations / sec
             </span>
           </div>
-          <div className="w-full h-[3px] bg-[#1C1812] rounded-[2px] overflow-hidden mt-1">
-            <div className="h-full bg-[#C5A880] rounded-[2px] w-full" />
+          <div className="w-full h-[3px] bg-[#070708] border border-[#1E1E1E] rounded-none overflow-hidden mt-1 p-[0.5px]">
+            <div className="h-full bg-[#C5A880] w-full" />
           </div>
         </div>
 
         {/* KPI 2: TOTAL NEGOTIATIONS */}
-        <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col justify-between select-none">
-          <span className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675]">
+        <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col justify-between select-none relative group">
+          <div className="absolute top-1 left-1 w-1 h-1 border-t border-l border-[#C5A880]/15 group-hover:border-[#C5A880]/30 transition-colors" />
+          <span className="text-[9px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78]">
             Total Negotiations
           </span>
           <div className="my-2">
-            <span className="font-mono text-3xl font-bold text-[#E5D3B3] tabular-nums" suppressHydrationWarning>
+            <span className="font-mono text-2xl font-light text-[#E5D3B3] tabular-nums" suppressHydrationWarning>
               {loc(summary.total_negotiations)}
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-wide text-[#8E8675] block mt-0.5 font-bold">
+            <span className="font-mono text-[8px] uppercase tracking-widest text-[#807E78] block mt-1 font-bold">
               in {meta.duration_secs || 23.32} seconds
             </span>
           </div>
-          <div className="w-full h-[3px] bg-[#1C1812] rounded-[2px] overflow-hidden mt-1">
-            <div className="h-full bg-[#C5A880] rounded-[2px] w-full" />
+          <div className="w-full h-[3px] bg-[#070708] border border-[#1E1E1E] rounded-none overflow-hidden mt-1 p-[0.5px]">
+            <div className="h-full bg-[#C5A880] w-full" />
           </div>
         </div>
 
         {/* KPI 3: TRANSACTION SUCCESS RATE */}
-        <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col justify-between select-none">
-          <span className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675]">
+        <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col justify-between select-none relative group">
+          <div className="absolute top-1 left-1 w-1 h-1 border-t border-l border-[#C5A880]/15 group-hover:border-[#C5A880]/30 transition-colors" />
+          <span className="text-[9px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78]">
             Success Rate
           </span>
           <div className="my-2">
-            <span className="font-mono text-3xl font-bold text-[#C5A880] tabular-nums" suppressHydrationWarning>
+            <span className="font-mono text-2xl font-bold text-[#C5A880] tabular-nums" suppressHydrationWarning>
               {summary.success_rate_pct.toFixed(2)}%
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-wide text-[#8E8675] block mt-0.5 font-bold" suppressHydrationWarning>
-              {loc(summary.deals_closed)} closed · {loc(summary.deals_failed)} failed
+            <span className="font-mono text-[8px] uppercase tracking-widest text-[#807E78] block mt-1 font-bold" suppressHydrationWarning>
+              {loc(summary.deals_closed)} closed / {loc(summary.deals_failed)} failed
             </span>
           </div>
-          <div className="w-full h-[3px] bg-[#1C1812] rounded-[2px] overflow-hidden mt-1">
+          <div className="w-full h-[3px] bg-[#070708] border border-[#1E1E1E] rounded-none overflow-hidden mt-1 p-[0.5px]">
             <div 
-              className="h-full bg-[#C5A880] rounded-[2px]" 
+              className="h-full bg-[#C5A880]" 
               style={{ width: `${summary.success_rate_pct}%` }}
             />
           </div>
         </div>
 
         {/* KPI 4: PROCESSED GMV */}
-        <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col justify-between select-none">
-          <span className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675]">
+        <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col justify-between select-none relative group">
+          <div className="absolute top-1 left-1 w-1 h-1 border-t border-l border-[#C5A880]/15 group-hover:border-[#C5A880]/30 transition-colors" />
+          <span className="text-[9px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78]">
             Processed GMV
           </span>
           <div className="my-2">
-            <span className="font-mono text-xl font-bold text-[#E5D3B3] tabular-nums block truncate">
+            <span className="font-mono text-[16px] font-bold text-[#E5D3B3] tabular-nums block truncate">
               {formatINR(summary.total_deal_value_inr)}
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-wide text-[#8E8675] block mt-0.5 font-bold">
+            <span className="font-mono text-[8px] uppercase tracking-widest text-[#807E78] block mt-1 font-bold">
               fees: {formatINR(summary.platform_fee_inr)}
             </span>
           </div>
-          <div className="w-full h-[3px] bg-[#1C1812] rounded-[2px] overflow-hidden mt-1">
-            <div className="h-full bg-[#C5A880] rounded-[2px] w-2/3" />
+          <div className="w-full h-[3px] bg-[#070708] border border-[#1E1E1E] rounded-none overflow-hidden mt-1 p-[0.5px]">
+            <div className="h-full bg-[#C5A880] w-2/3" />
           </div>
         </div>
 
         {/* KPI 5: AVERAGE SAVINGS */}
-        <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col justify-between select-none">
-          <span className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675]">
+        <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col justify-between select-none relative group">
+          <div className="absolute top-1 left-1 w-1 h-1 border-t border-l border-[#C5A880]/15 group-hover:border-[#C5A880]/30 transition-colors" />
+          <span className="text-[9px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78]">
             Avg MSME Savings
           </span>
           <div className="my-2">
-            <span className="font-mono text-3xl font-bold text-[#E5D3B3] tabular-nums">
+            <span className="font-mono text-2xl font-bold text-[#E5D3B3] tabular-nums">
               {summary.avg_buyer_savings_pct.toFixed(2)}%
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-wide text-[#8E8675] block mt-0.5 font-bold">
+            <span className="font-mono text-[8px] uppercase tracking-widest text-[#807E78] block mt-1 font-bold">
               vs list: {summary.avg_vs_list_pct.toFixed(2)}% · rounds: {summary.avg_rounds_per_deal}
             </span>
           </div>
-          <div className="w-full h-[3px] bg-[#1C1812] rounded-[2px] overflow-hidden mt-1">
+          <div className="w-full h-[3px] bg-[#070708] border border-[#1E1E1E] rounded-none overflow-hidden mt-1 p-[0.5px]">
             <div 
-              className="h-full bg-[#C5A880] rounded-[2px]" 
+              className="h-full bg-[#C5A880]" 
               style={{ width: `${summary.avg_buyer_savings_pct}%` }}
             />
           </div>
@@ -191,14 +195,15 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* CATEGORY PERFORMANCE LEDGER */}
-        <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col">
-          <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-4 border-b border-[#1C1812] pb-2">
+        <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col relative">
+          <div className="absolute top-2 left-2 w-1 h-1 border-t border-l border-[#C5A880]/15" />
+          <div className="text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-4 border-b border-[#1E1E1E] pb-2">
             Category Performance Ledger
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse select-none">
               <thead>
-                <tr className="border-b border-[#1C1812] text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] h-8 bg-[#060606]/35">
+                <tr className="border-b border-[#1E1E1E] text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] h-8 bg-[#070708]/35">
                   <th className="pb-2">Category</th>
                   <th className="pb-2 text-right">Total Deals</th>
                   <th className="pb-2 text-right">Success %</th>
@@ -208,14 +213,14 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
               </thead>
               <tbody className="font-mono text-[11px] text-[#E5D3B3] tabular-nums">
                 {Object.entries(by_category).map(([key, cat]) => (
-                  <tr key={key} className="border-b border-[#1C1812]/50 h-8 hover:bg-[#1C1812]/20 transition-colors">
-                    <td className="py-1.5 font-sans font-bold text-[#8E8675] text-[11px]">
+                  <tr key={key} className="border-b border-[#1E1E1E]/30 h-8 hover:bg-[#1E1E1E]/10 transition-colors">
+                    <td className="py-1.5 font-sans font-bold text-[#807E78] text-[11px]">
                       {CATEGORY_LABELS[key] || key}
                     </td>
                     <td className="py-1.5 text-right" suppressHydrationWarning>{loc(cat.total)}</td>
                     <td className="py-1.5 text-right">{cat.success_pct.toFixed(1)}%</td>
                     <td className="py-1.5 text-right text-[#C5A880] font-bold">{cat.avg_savings_pct.toFixed(2)}%</td>
-                    <td className="py-1.5 text-right text-[#8E8675]" suppressHydrationWarning>{loc(cat.moq_waivers)}</td>
+                    <td className="py-1.5 text-right text-[#807E78]" suppressHydrationWarning>{loc(cat.moq_waivers)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -227,14 +232,15 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
         <div className="flex flex-col gap-6">
           
           {/* STRATEGY PERFORMANCE MATRIX */}
-          <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col flex-1">
-            <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-4 border-b border-[#1C1812] pb-2">
+          <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col flex-1 relative">
+            <div className="absolute top-2 left-2 w-1 h-1 border-t border-l border-[#C5A880]/15" />
+            <div className="text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-4 border-b border-[#1E1E1E] pb-2">
               Seller Strategy Performance Matrix
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse select-none">
                 <thead>
-                  <tr className="border-b border-[#1C1812] text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] h-8 bg-[#060606]/35">
+                  <tr className="border-b border-[#1E1E1E] text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] h-8 bg-[#070708]/35">
                     <th className="pb-2">Strategy</th>
                     <th className="pb-2 text-right">Negotiations</th>
                     <th className="pb-2 text-right">Success Rate</th>
@@ -243,8 +249,8 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
                 </thead>
                 <tbody className="font-mono text-[11px] text-[#E5D3B3] tabular-nums">
                   {Object.entries(by_strategy).map(([key, strat]) => (
-                    <tr key={key} className="border-b border-[#1C1812]/50 h-8 hover:bg-[#1C1812]/20 transition-colors">
-                      <td className="py-1.5 font-sans font-bold text-[#8E8675] text-[11px]">
+                    <tr key={key} className="border-b border-[#1E1E1E]/30 h-8 hover:bg-[#1E1E1E]/10 transition-colors">
+                      <td className="py-1.5 font-sans font-bold text-[#807E78] text-[11px]">
                         {STRATEGY_LABELS[key] || key}
                       </td>
                       <td className="py-1.5 text-right" suppressHydrationWarning>{loc(strat.total)}</td>
@@ -259,14 +265,15 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
 
           {/* BUYER PROFILE ANALYSIS */}
           {by_buyer_profile && (
-            <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col flex-1">
-              <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-4 border-b border-[#1C1812] pb-2">
+            <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col flex-1 relative">
+              <div className="absolute top-2 left-2 w-1 h-1 border-t border-l border-[#C5A880]/15" />
+              <div className="text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-4 border-b border-[#1E1E1E] pb-2">
                 Buyer Profile Analysis
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse select-none">
                   <thead>
-                    <tr className="border-b border-[#1C1812] text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] h-8 bg-[#060606]/35">
+                    <tr className="border-b border-[#1E1E1E] text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] h-8 bg-[#070708]/35">
                       <th className="pb-2">Buyer Profile</th>
                       <th className="pb-2 text-right">Deals</th>
                       <th className="pb-2 text-right">Success %</th>
@@ -276,14 +283,14 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
                   </thead>
                   <tbody className="font-mono text-[11px] text-[#E5D3B3] tabular-nums">
                     {Object.entries(by_buyer_profile).map(([key, profile]) => (
-                      <tr key={key} className="border-b border-[#1C1812]/50 h-10 hover:bg-[#1C1812]/20 transition-colors">
-                        <td className="py-1.5 font-sans font-bold text-[#8E8675] text-[11px]">
+                      <tr key={key} className="border-b border-[#1E1E1E]/30 h-10 hover:bg-[#1E1E1E]/10 transition-colors">
+                        <td className="py-1.5 font-sans font-bold text-[#807E78] text-[11px]">
                           {BUYER_PROFILE_LABELS[key] || key}
                         </td>
                         <td className="py-1.5 text-right" suppressHydrationWarning>{loc(profile.total)}</td>
                         <td className="py-1.5 text-right">{profile.success_pct.toFixed(1)}%</td>
                         <td className="py-1.5 text-right text-[#C5A880] font-bold">{profile.avg_savings_pct.toFixed(2)}%</td>
-                        <td className="py-1.5 font-sans text-[10px] text-[#8E8675] pl-4 max-w-[200px] truncate" title={profile.desc}>
+                        <td className="py-1.5 font-sans text-[10px] text-[#807E78] pl-4 max-w-[200px] truncate" title={profile.desc}>
                           {profile.desc}
                         </td>
                       </tr>
@@ -302,8 +309,9 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* FAILURE MODE AUDIT LOG & SAMPLES */}
-        <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col">
-          <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-4 border-b border-[#1C1812] pb-2">
+        <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col relative">
+          <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-[#C5A880]/15" />
+          <div className="text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-4 border-b border-[#1E1E1E] pb-2">
             Failure Mode & Architectural Audit Log
           </div>
           
@@ -314,22 +322,22 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
                 <div
                   key={fail.reason}
                   onClick={() => setSelectedFailureReason(fail.reason)}
-                  className={`p-3 border rounded-[4px] cursor-pointer transition-all duration-150 select-none ${
+                  className={`p-3 border rounded-none cursor-pointer transition-all duration-150 select-none ${
                     selectedFailureReason === fail.reason
-                      ? "border-[#C5A880] bg-[#1C1812]/40"
-                      : "border-[#1C1812] bg-transparent hover:bg-[#1C1812]/20"
+                      ? "border-[#C5A880] bg-[#1E1E1E]/40"
+                      : "border-[#1E1E1E]/40 bg-transparent hover:bg-[#1E1E1E]/20"
                   }`}
                 >
                   <div className="flex justify-between items-baseline mb-1">
-                    <span className="font-sans font-bold text-[11px] text-[#E5D3B3] uppercase tracking-wider">
+                    <span className="font-sans font-bold text-[10.5px] text-[#E5D3B3] uppercase tracking-wider">
                       {fail.label}
                     </span>
-                    <span className="font-mono text-[10px] text-[#8E8675] tabular-nums font-bold" suppressHydrationWarning>
+                    <span className="font-mono text-[9.5px] text-[#807E78] tabular-nums font-bold" suppressHydrationWarning>
                       {loc(fail.count)} ({fail.pct.toFixed(0)}%)
                     </span>
                   </div>
-                  <span className={`text-[8px] font-mono uppercase tracking-wider px-1.5 py-0.5 border rounded-[2px] font-bold ${getSeverityColor(fail.severity)}`}>
-                    {fail.severity} risk
+                  <span className={`text-[7.5px] font-mono uppercase tracking-widest px-1.5 py-0.5 border rounded-none font-bold ${getSeverityColor(fail.severity)}`}>
+                    [ {fail.severity.toUpperCase()} RISK ]
                   </span>
                 </div>
               ))}
@@ -337,20 +345,20 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
 
             {/* Failure Audit/Fix Card */}
             {activeFailureData && (
-              <div className="p-4 bg-[#060606] border border-[#1C1812] rounded-[4px] flex flex-col justify-between">
+              <div className="p-4 bg-[#070708] border border-[#1E1E1E] rounded-none flex flex-col justify-between">
                 <div>
-                  <div className="text-[9px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-1">
+                  <div className="text-[8.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-1">
                     Root Cause Analysis
                   </div>
-                  <p className="text-[11px] text-[#8E8675] font-sans mb-3 leading-normal font-semibold">
+                  <p className="text-[10.5px] text-[#807E78] font-sans mb-3 leading-normal font-semibold">
                     {activeFailureData.desc}
                   </p>
                 </div>
-                <div className="border-t border-[#1C1812] pt-3">
-                  <div className="text-[9px] font-sans font-bold uppercase tracking-[0.08em] text-[#E5D3B3] mb-1">
-                    🔧 Proposed Architectural Fix
+                <div className="border-t border-[#1E1E1E] pt-3">
+                  <div className="text-[8.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#E5D3B3] mb-1">
+                    [FIX] Proposed Architectural Fix
                   </div>
-                  <p className="text-[10px] text-[#8E8675] font-sans leading-normal italic font-semibold">
+                  <p className="text-[9.5px] text-[#807E78] font-sans leading-normal italic font-bold">
                     {activeFailureData.fix}
                   </p>
                 </div>
@@ -360,14 +368,14 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
 
           {/* Failure Samples Subledger */}
           {activeFailureData?.samples && activeFailureData.samples.length > 0 && (
-            <div className="border-t border-[#1C1812] pt-4 mt-2">
-              <div className="text-[9px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-2">
+            <div className="border-t border-[#1E1E1E] pt-4 mt-2">
+              <div className="text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-2">
                 Live Negotiating Failure Samples ({activeFailureData.label})
               </div>
               <div className="overflow-x-auto max-h-[160px] overflow-y-auto pr-1">
                 <table className="w-full text-left border-collapse select-none">
                   <thead>
-                    <tr className="border-b border-[#1C1812] text-[9px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] h-6 bg-[#060606]/35">
+                    <tr className="border-b border-[#1E1E1E] text-[8.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] h-6 bg-[#070708]/35">
                       <th className="pl-1">Seller Entity</th>
                       <th>Category</th>
                       <th className="text-right">Price Gap %</th>
@@ -376,17 +384,17 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
                   </thead>
                   <tbody className="font-mono text-[10px] text-[#E5D3B3] tabular-nums">
                     {activeFailureData.samples.map((sample, index) => (
-                      <tr key={index} className="border-b border-[#1C1812]/30 h-6 hover:bg-[#1C1812]/20 transition-colors">
-                        <td className="py-1 pl-1 font-sans text-[#8E8675] font-bold truncate max-w-[150px]">
+                      <tr key={index} className="border-b border-[#1E1E1E]/20 h-6 hover:bg-[#1E1E1E]/10 transition-colors">
+                        <td className="py-1 pl-1 font-sans text-[#807E78] font-bold truncate max-w-[150px]">
                           {sample.seller}
                         </td>
-                        <td className="py-1 text-[#4A4339] font-sans font-bold text-[9px] uppercase tracking-wide">
+                        <td className="py-1 text-[#48484A] font-sans font-bold text-[8.5px] uppercase tracking-widest">
                           {CATEGORY_LABELS[sample.category] || sample.category}
                         </td>
                         <td className="py-1 text-right text-[#C5A880] font-bold">
                           +{sample.price_gap_pct.toFixed(1)}%
                         </td>
-                        <td className="py-1 text-right font-sans text-[9px] text-[#8E8675] font-bold uppercase tracking-wider">
+                        <td className="py-1 text-right font-sans text-[8.5px] text-[#807E78] font-bold uppercase tracking-widest">
                           {STRATEGY_LABELS[sample.strategy] || sample.strategy}
                         </td>
                       </tr>
@@ -399,36 +407,37 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
         </div>
 
         {/* SENTINEL SECURITY AUDIT LEDGER */}
-        <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col justify-between">
+        <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col justify-between relative">
+          <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-[#C5A880]/15" />
           <div>
-            <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-4 border-b border-[#1C1812] pb-2 flex justify-between items-baseline">
+            <div className="text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-4 border-b border-[#1E1E1E] pb-2 flex justify-between items-baseline">
               <span>Sentinel Security Audit Ledger</span>
-              <span className="font-mono text-[9px] text-[#4A4339] font-bold">8 security checks / round</span>
+              <span className="font-mono text-[8px] text-[#48484A] font-bold">[ 8 security checks / round ]</span>
             </div>
 
             {/* Sub-KPIs */}
             <div className="grid grid-cols-3 gap-2 mb-4 text-center select-none font-mono">
-              <div className="p-2 border border-[#1C1812] bg-[#060606] rounded-[4px]">
-                <div className="text-xs font-bold text-[#E5D3B3] tabular-nums" suppressHydrationWarning>
+              <div className="p-2 border border-[#1E1E1E] bg-[#070708] rounded-none">
+                <div className="text-[11.5px] font-bold text-[#E5D3B3] tabular-nums" suppressHydrationWarning>
                   {loc(sentinel.total_sessions_monitored)}
                 </div>
-                <div className="text-[8px] font-sans font-bold uppercase tracking-wider text-[#8E8675] mt-0.5">
+                <div className="text-[7.5px] font-sans font-bold uppercase tracking-wider text-[#807E78] mt-0.5">
                   Monitored Deals
                 </div>
               </div>
-              <div className="p-2 border border-[#1C1812] bg-[#060606] rounded-[4px]">
-                <div className="text-xs font-bold text-[#C5A880] tabular-nums">
+              <div className="p-2 border border-[#1E1E1E] bg-[#070708] rounded-none">
+                <div className="text-[11.5px] font-bold text-[#C5A880] tabular-nums">
                   {sentinel.total_alerts}
                 </div>
-                <div className="text-[8px] font-sans font-bold uppercase tracking-wider text-[#8E8675] mt-0.5">
+                <div className="text-[7.5px] font-sans font-bold uppercase tracking-wider text-[#807E78] mt-0.5">
                   Active Alerts
                 </div>
               </div>
-              <div className="p-2 border border-[#1C1812] bg-[#060606] rounded-[4px]">
-                <div className="text-xs font-bold text-[#E5D3B3] tabular-nums">
+              <div className="p-2 border border-[#1E1E1E] bg-[#070708] rounded-none">
+                <div className="text-[11.5px] font-bold text-[#E5D3B3] tabular-nums">
                   {sentinel.round_exhaustion_rate_pct.toFixed(2)}%
                 </div>
-                <div className="text-[8px] font-sans font-bold uppercase tracking-wider text-[#8E8675] mt-0.5">
+                <div className="text-[7.5px] font-sans font-bold uppercase tracking-wider text-[#807E78] mt-0.5">
                   Exhaustion Rate
                 </div>
               </div>
@@ -436,35 +445,35 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
 
             {/* Alert Logs */}
             <div className="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1">
-              <div className="text-[9px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-1">
+              <div className="text-[8.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-1.5">
                 Real-Time Sentinel Warning Stream
               </div>
               
               {sentinel.sample_alerts && sentinel.sample_alerts.length > 0 ? (
                 sentinel.sample_alerts.map((alert, index) => (
-                  <div key={`${alert.alert_id}_${index}`} className="p-3 border border-[#1C1812] bg-[#060606] rounded-[4px] font-mono text-[10px]">
+                  <div key={`${alert.alert_id}_${index}`} className="p-3 border border-[#1E1E1E] bg-[#070708] rounded-none font-mono text-[9.5px]">
                     <div className="flex justify-between items-baseline mb-1">
                       <span className="font-bold text-[#C5A880]">
-                        🚨 {alert.alert_id}
+                        [ALERT] {alert.alert_id}
                       </span>
-                      <span className="text-[8px] uppercase px-1.5 py-0.2 border border-[#1C1812] bg-[#060606] rounded-[2px] text-[#8E8675] font-bold">
+                      <span className="text-[7.5px] uppercase px-1.5 py-0.2 border border-[#1E1E1E] bg-[#070708] rounded-none text-[#807E78] font-bold">
                         {alert.severity} / {alert.category}
                       </span>
                     </div>
-                    <p className="text-[#8E8675] font-sans text-[10px] leading-normal mt-1 font-semibold">
+                    <p className="text-[#807E78] font-sans text-[9.5px] leading-normal mt-1 font-semibold">
                       {alert.message}
                     </p>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-6 text-[#4A4339] font-mono text-[10px] font-bold">
-                  ✓ ZERO CRITICAL THREATS DETECTED BY SENTINEL
+                <div className="text-center py-6 text-[#48484A] font-mono text-[9px] font-bold tracking-widest">
+                  [ CHECK: ZERO THREATS DETECTED BY SENTINEL ]
                 </div>
               )}
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-[#1C1812] font-mono text-[9px] text-[#4A4339] leading-normal uppercase font-bold">
+          <div className="mt-4 pt-3.5 border-t border-[#1E1E1E] font-mono text-[8px] text-[#48484A] leading-normal uppercase font-bold tracking-wider">
             Sentinel checks: collusion detection, transaction outliers, bait & switch, prompt injection blocks, and MOQ evasion prevention.
           </div>
         </div>
@@ -472,15 +481,16 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
       </div>
 
       {/* SECTION 4: AGENT PERFORMANCE LEADERBOARD LEDGER */}
-      <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col select-none">
-        <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-4 border-b border-[#1C1812] pb-2 flex justify-between items-baseline">
+      <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col select-none relative">
+        <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-[#C5A880]/15" />
+        <div className="text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-4 border-b border-[#1E1E1E] pb-2 flex justify-between items-baseline">
           <span>Top-Performing Seller Agent Leaderboard</span>
-          <span className="font-sans text-[9px] text-[#4A4339] font-bold uppercase tracking-wider">Top 10 Entities Ranked by MSME Cost-Reduction Yield</span>
+          <span className="font-sans text-[8.5px] text-[#48484A] font-bold uppercase tracking-wider">Top 10 Entities Ranked by MSME Cost-Reduction Yield</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#1C1812] text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] h-8 bg-[#060606]/35">
+              <tr className="border-b border-[#1E1E1E] text-[9.5px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] h-8 bg-[#070708]/35">
                 <th className="pb-2 pl-2">Rank</th>
                 <th className="pb-2">Seller Agent Entity</th>
                 <th className="pb-2">Entity ID</th>
@@ -494,13 +504,13 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
             </thead>
             <tbody className="font-mono text-[11px] text-[#E5D3B3] tabular-nums">
               {agent_leaderboard.slice(0, 10).map((seller, index) => (
-                <tr key={seller.seller_id} className="border-b border-[#1C1812]/50 h-9 hover:bg-[#1C1812]/20 transition-colors">
-                  <td className="py-2 pl-2 text-[#8E8675] font-bold">#{index + 1}</td>
+                <tr key={seller.seller_id} className="border-b border-[#1E1E1E]/30 h-9 hover:bg-[#1E1E1E]/10 transition-colors">
+                  <td className="py-2 pl-2 text-[#807E78] font-bold">#{index + 1}</td>
                   <td className="py-2 font-sans font-bold text-[#E5D3B3] text-[11px]">
                     {seller.name}
                   </td>
-                  <td className="py-2 text-[#8E8675] font-semibold">{seller.seller_id}</td>
-                  <td className="py-2 text-[#8E8675] font-sans font-bold text-[10px] uppercase tracking-wide">
+                  <td className="py-2 text-[#807E78] font-semibold">{seller.seller_id}</td>
+                  <td className="py-2 text-[#807E78] font-sans font-bold text-[9.5px] uppercase tracking-wider">
                     {CATEGORY_LABELS[seller.category] || seller.category}
                   </td>
                   <td className="py-2 text-right" suppressHydrationWarning>{loc(seller.queried)}</td>
@@ -509,8 +519,8 @@ export function AutomotiveReportView({ report }: AutomotiveReportViewProps) {
                   <td className="py-2 text-right text-[#C5A880] font-bold">
                     {seller.avg_savings_pct.toFixed(2)}%
                   </td>
-                  <td className="py-2 font-sans text-[10px] text-[#8E8675] pl-4">
-                    <span className="px-2 py-0.5 border border-[#1C1812] bg-[#060606] rounded-[3px] text-[#8E8675] uppercase tracking-wider text-[9px] font-bold">
+                  <td className="py-2 font-sans text-[10px] text-[#807E78] pl-4">
+                    <span className="px-2 py-0.5 border border-[#1E1E1E] bg-[#070708] rounded-none text-[#807E78] uppercase tracking-widest text-[8.5px] font-bold">
                       {STRATEGY_LABELS[seller.strategy] || seller.strategy}
                     </span>
                   </td>

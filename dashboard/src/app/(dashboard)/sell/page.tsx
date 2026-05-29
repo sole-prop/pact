@@ -385,11 +385,11 @@ export default function SellPage() {
           {activeTab === "register" ? (
             <form 
               onSubmit={handleRegisterService} 
-              className="flex flex-col gap-6 bg-[#111111] border border-[#1E1E1E] rounded-[6px] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.4)] relative overflow-hidden"
+              className="premium-form relative overflow-hidden"
             >
               {/* Service/Company Name */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="form-group-spacious">
+                <label>
                   Service Provider / Company Name
                 </label>
                 <input
@@ -398,28 +398,28 @@ export default function SellPage() {
                   onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="e.g. Apex Software Solutions"
-                  className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs font-sans text-white/90 focus:outline-none focus:ring-1 focus:ring-[#C5A880]/20 transition-all duration-300"
+                  className="premium-input"
                 />
               </div>
 
               {/* Category Dropdown Selector */}
-              <div className="flex flex-col gap-2 relative select-none">
-                <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="form-group-spacious relative select-none">
+                <label>
                   Service Category Range
                 </label>
                 <div 
                   onClick={() => setShowCatDropdown(!showCatDropdown)}
-                  className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs text-[#E5D3B3] font-semibold cursor-pointer flex justify-between items-center transition-all duration-300 focus-within:ring-1 focus-within:ring-[#C5A880]/20"
+                  className="w-full bg-[#050505] border border-[#1C1812] rounded-[4px] py-4 px-5 text-xs text-[#E5D3B3] font-semibold cursor-pointer flex justify-between items-center transition-all duration-300 focus-within:ring-1 focus-within:ring-[#C5A880]/20"
                 >
-                  <span className="text-[12px] text-[#E5D3B3] font-sans tracking-wide">
+                  <span className="text-[12px] text-[#E5D3B3] font-sans font-bold uppercase tracking-wider">
                     {CATEGORIES.find(c => c.value === category)?.label || "Select Category"}
                   </span>
                   <span className="text-[#C5A880] text-[9px] tracking-widest">{showCatDropdown ? "▲" : "▼"}</span>
                 </div>
                 
                 {showCatDropdown && (
-                  <div className="absolute top-[62px] left-0 right-0 z-50 bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] shadow-2xl overflow-hidden">
-                    <div className="max-h-[220px] overflow-y-auto py-1.5">
+                  <div className="absolute top-[72px] left-0 right-0 z-50 bg-[#050505] border border-[#1C1812] rounded-[4px] shadow-2xl overflow-hidden">
+                    <div className="max-h-[220px] overflow-y-auto py-2">
                       {CATEGORIES.map((cat) => (
                         <div 
                           key={cat.value} 
@@ -435,7 +435,7 @@ export default function SellPage() {
                               setCurrentStockUnits(defaults.stock);
                             }
                           }}
-                          className={`px-4 py-2.5 text-[10px] font-sans font-bold uppercase tracking-wider text-[#8E8E93] hover:text-[#E5D3B3] hover:bg-white/[0.02] cursor-pointer transition-colors ${
+                          className={`px-5 py-3 text-[10px] font-sans font-bold uppercase tracking-wider text-[#8E8E93] hover:text-[#E5D3B3] hover:bg-white/[0.02] cursor-pointer transition-colors ${
                             cat.value === category ? "text-[#C5A880] bg-white/[0.015]" : ""
                           }`}
                         >
@@ -448,8 +448,8 @@ export default function SellPage() {
               </div>
 
               {/* Service Description and OpenAI Optimizer */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="form-group-spacious">
+                <label>
                   Service Description & Core Competencies
                 </label>
                 <textarea
@@ -458,23 +458,23 @@ export default function SellPage() {
                   rows={3}
                   required
                   placeholder="Describe your service delivery, specialized technologies, and project competencies..."
-                  className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs font-sans text-white/90 focus:outline-none focus:ring-1 focus:ring-[#C5A880]/20 transition-all duration-300 resize-none leading-relaxed"
+                  className="w-full bg-[#050505] border border-[#1C1812] rounded-[4px] py-4 px-5 text-xs font-sans text-white/90 focus:outline-none focus:ring-1 focus:ring-[#C5A880]/20 transition-all duration-300 resize-none leading-relaxed"
                 />
                 
                 <button
                   type="button"
                   onClick={handleOptimizeProfile}
                   disabled={isOptimizing}
-                  className="text-left text-[9px] font-mono font-bold uppercase tracking-wider text-[#C5A880] hover:text-[#E5D3B3] transition-colors cursor-pointer select-none bg-transparent border-none flex items-center gap-1.5 mt-1"
+                  className="text-left text-[9px] font-mono font-bold uppercase tracking-widest text-[#C5A880] hover:text-[#E5D3B3] transition-colors cursor-pointer select-none bg-transparent border-none flex items-center gap-1.5 mt-1"
                 >
-                  {isOptimizing ? "Running actuary positioning audit..." : "🔮 Optimize pricing & thresholds (OpenAI)"}
+                  {isOptimizing ? "Running actuary positioning audit..." : "[ACTUARY] Optimize pricing & thresholds (OpenAI)"}
                 </button>
 
                 {optResult && (
-                  <div className="p-3.5 bg-[#C5A880]/[0.02] border border-[#C5A880]/15 rounded-[4px] flex flex-col gap-2 font-mono text-[9px] uppercase tracking-wide leading-relaxed text-[#E5D3B3] select-text">
-                    <div className="text-[#C5A880] font-bold">⚡ AI Actuary Assessment:</div>
+                  <div className="p-4 bg-[#C5A880]/[0.02] border border-[#C5A880]/15 rounded-[4px] flex flex-col gap-2 font-mono text-[9px] uppercase tracking-wider leading-relaxed text-[#E5D3B3] select-text">
+                    <div className="text-[#C5A880] font-bold">[AI AUDIT] Sourcing Threshold Assessment:</div>
                     <div>{optResult.justification}</div>
-                    <div className="pt-1.5 border-t border-[#1E1E1E] text-[8.5px] text-[#8E8E93]">
+                    <div className="pt-1.5 border-t border-[#1C1812] text-[8.5px] text-[#8E8675]">
                       Target Pitch: &quot;{optResult.pitch}&quot;
                     </div>
                   </div>
@@ -482,9 +482,9 @@ export default function SellPage() {
               </div>
 
               {/* List and Floor Pricing */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="form-group-spacious">
+                  <label>
                     {labels.listLabel}
                   </label>
                   <input
@@ -493,12 +493,12 @@ export default function SellPage() {
                     onChange={(e) => setListPrice(Number(e.target.value))}
                     min={1}
                     required
-                    className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none"
+                    className="premium-input"
                   />
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+                <div className="form-group-spacious">
+                  <label>
                     {labels.floorLabel}
                   </label>
                   <input
@@ -507,15 +507,15 @@ export default function SellPage() {
                     onChange={(e) => setFloorPrice(Number(e.target.value))}
                     min={1}
                     required
-                    className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none"
+                    className="premium-input"
                   />
                 </div>
               </div>
 
               {/* MOQ and Max Order Capacity */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="form-group-spacious">
+                  <label>
                     {labels.moqLabel}
                   </label>
                   <input
@@ -524,12 +524,12 @@ export default function SellPage() {
                     onChange={(e) => setMoq(Number(e.target.value))}
                     min={1}
                     required
-                    className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none"
+                    className="premium-input"
                   />
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+                <div className="form-group-spacious">
+                  <label>
                     {labels.maxLabel}
                   </label>
                   <input
@@ -538,14 +538,14 @@ export default function SellPage() {
                     onChange={(e) => setMaxQty(Number(e.target.value))}
                     min={1}
                     required
-                    className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none"
+                    className="premium-input"
                   />
                 </div>
               </div>
 
               {/* Available Stock/Hours Capacity Pool */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="form-group-spacious">
+                <label>
                   {labels.stockLabel}
                 </label>
                 <input
@@ -554,16 +554,16 @@ export default function SellPage() {
                   onChange={(e) => setCurrentStockUnits(Number(e.target.value))}
                   min={1}
                   required
-                  className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none"
+                  className="premium-input"
                 />
               </div>
 
               {/* Quality Grade selection */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="form-group-spacious">
+                <label>
                   Service Quality Grade
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   {QUALITY_GRADES.map(grade => {
                     const isSelected = qualityGrade === grade;
                     return (
@@ -571,10 +571,10 @@ export default function SellPage() {
                         type="button"
                         key={grade}
                         onClick={() => setQualityGrade(grade)}
-                        className={`py-2 px-4 text-center text-[9px] uppercase tracking-wider font-extrabold rounded-[4px] border transition-all duration-300 cursor-pointer ${
+                        className={`py-3 px-4 text-center text-[9px] uppercase tracking-widest font-extrabold rounded-[4px] border transition-all duration-300 cursor-pointer ${
                           isSelected
                             ? "bg-[#C5A880] border-[#C5A880] text-[#050505] shadow-md"
-                            : "bg-[#0A0A0A] border-[#1E1E1E] text-[#8E8E93] hover:text-[#E5D3B3]"
+                            : "bg-[#050505] border-[#1C1812] text-[#8E8675] hover:text-[#E5D3B3]"
                         }`}
                       >
                         Grade {grade}
@@ -585,11 +585,11 @@ export default function SellPage() {
               </div>
 
               {/* Operating Location Hub selector */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="form-group-spacious">
+                <label>
                   Operating Sourcing Hub Location
                 </label>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-5 gap-3">
                   {SOURCING_HUBS.map(hub => {
                     const isSelected = locationState === hub;
                     return (
@@ -597,10 +597,10 @@ export default function SellPage() {
                         type="button"
                         key={hub}
                         onClick={() => setLocationState(hub)}
-                        className={`py-2 px-1 text-center text-[9px] uppercase tracking-wider font-extrabold rounded-[4px] border transition-all duration-300 cursor-pointer ${
+                        className={`py-3 px-1 text-center text-[9px] uppercase tracking-widest font-extrabold rounded-[4px] border transition-all duration-300 cursor-pointer ${
                           isSelected
                             ? "bg-[#C5A880] border-[#C5A880] text-[#050505]"
-                            : "bg-[#0A0A0A] border-[#1E1E1E] text-[#8E8E93] hover:text-[#E5D3B3]"
+                            : "bg-[#050505] border-[#1C1812] text-[#8E8675] hover:text-[#E5D3B3]"
                         }`}
                       >
                         {hub.split(" ")[0]}
@@ -611,11 +611,11 @@ export default function SellPage() {
               </div>
 
               {/* Possessed Compliance Certifications */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="form-group-spacious">
+                <label>
                   Compliance Certifications Possessed
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {CERTIFICATIONS.map(cert => {
                     const isSelected = certifications.includes(cert);
                     return (
@@ -623,13 +623,13 @@ export default function SellPage() {
                         type="button"
                         key={cert}
                         onClick={() => handleCertToggle(cert)}
-                        className={`py-1.5 px-3 text-[9px] font-mono font-bold rounded-[4px] border transition-all duration-200 cursor-pointer ${
+                        className={`py-2 px-3 text-[9px] font-mono font-bold rounded-[4px] border transition-all duration-200 cursor-pointer ${
                           isSelected
                             ? "bg-white/[0.04] border-[#C5A880] text-[#C5A880]"
-                            : "bg-[#0A0A0A] border-[#1E1E1E] text-[#8E8E93] hover:text-white"
+                            : "bg-[#050505] border-[#1C1812] text-[#8E8675] hover:text-white"
                         }`}
                       >
-                        {isSelected ? "✔ " : "+ "} {cert}
+                        {isSelected ? "[SELECTED] " : "[+ ] "} {cert}
                       </button>
                     );
                   })}
@@ -637,11 +637,11 @@ export default function SellPage() {
               </div>
 
               {/* Accepted Payment Terms */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="form-group-spacious">
+                <label>
                   Accepted Payment Terms
                 </label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {PAYMENT_TERMS_OPTIONS.map(term => {
                     const isSelected = acceptedPaymentTerms.includes(term.value);
                     return (
@@ -649,13 +649,13 @@ export default function SellPage() {
                         type="button"
                         key={term.value}
                         onClick={() => handlePaymentToggle(term.value)}
-                        className={`py-1.5 px-3 text-[9px] font-sans font-bold rounded-[4px] border transition-all duration-200 cursor-pointer ${
+                        className={`py-2 px-3 text-[9px] font-sans font-bold rounded-[4px] border transition-all duration-200 cursor-pointer ${
                           isSelected
                             ? "bg-white/[0.04] border-[#C5A880] text-[#C5A880]"
-                            : "bg-[#0A0A0A] border-[#1E1E1E] text-[#8E8E93] hover:text-white"
+                            : "bg-[#050505] border-[#1C1812] text-[#8E8675] hover:text-white"
                         }`}
                       >
-                        {isSelected ? "✔ " : "+ "} {term.label}
+                        {isSelected ? "[SELECTED] " : "[+ ] "} {term.label}
                       </button>
                     );
                   })}
@@ -663,9 +663,9 @@ export default function SellPage() {
               </div>
 
               {/* Slider for Maximum Discount percentage allowed */}
-              <div className="flex flex-col gap-2">
+              <div className="form-group-spacious">
                 <div className="flex justify-between items-baseline">
-                  <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+                  <label>
                     Maximum Negotiation Discount Allowed
                   </label>
                   <span className="font-mono text-xs text-[#C5A880] font-bold">{maxDiscountPct}%</span>
@@ -677,56 +677,56 @@ export default function SellPage() {
                   step="0.5"
                   value={maxDiscountPct}
                   onChange={(e) => setMaxDiscountPct(Number(e.target.value))}
-                  className="w-full accent-[#C5A880] bg-[#0A0A0A] rounded-[4px] cursor-pointer h-1.5"
+                  className="w-full accent-[#C5A880] bg-[#050505] rounded-[4px] cursor-pointer h-1.5"
                 />
               </div>
 
               {/* Delivery limits, Strategy and WhatsApp */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="form-group-spacious">
+                  <label>
                     Lead Time setup range (Days)
                   </label>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2.5 items-center">
                     <input
                       type="number"
                       value={deliveryMin}
                       onChange={(e) => setDeliveryMin(Number(e.target.value))}
                       min={1}
                       required
-                      className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-3 text-xs font-mono text-white/90 focus:outline-none"
+                      className="premium-input text-center"
                     />
-                    <span className="text-[#8E8E93] font-mono text-xs">-</span>
+                    <span className="text-[#8E8675] font-mono text-xs">-</span>
                     <input
                       type="number"
                       value={deliveryMax}
                       onChange={(e) => setDeliveryMax(Number(e.target.value))}
                       min={1}
                       required
-                      className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-3 text-xs font-mono text-white/90 focus:outline-none"
+                      className="premium-input text-center"
                     />
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2 relative">
-                  <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+                <div className="form-group-spacious relative">
+                  <label>
                     Negotiation Strategy Deck
                   </label>
                   <select
                     value={strategy}
                     onChange={(e) => setStrategy(e.target.value)}
-                    className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3 px-3.5 text-[11px] font-sans text-[#E5D3B3] font-semibold focus:outline-none cursor-pointer"
+                    className="w-full bg-[#050505] border border-[#1C1812] rounded-[4px] py-4 px-5 text-[11px] font-sans text-[#E5D3B3] font-semibold focus:outline-none cursor-pointer"
                   >
                     {STRATEGIES.map(s => (
-                      <option key={s.value} value={s.value} className="bg-[#0A0A0A] text-[#E5D3B3] py-2">{s.label}</option>
+                      <option key={s.value} value={s.value} className="bg-[#050505] text-[#E5D3B3] py-2">{s.label}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
               {/* WhatsApp notification alerts */}
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+              <div className="form-group-spacious">
+                <label>
                   Provider alerts WhatsApp Number
                 </label>
                 <input
@@ -734,7 +734,7 @@ export default function SellPage() {
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
                   required
-                  className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none"
+                  className="premium-input"
                 />
               </div>
 
@@ -742,25 +742,25 @@ export default function SellPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 text-center text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-[#050505] bg-[#C5A880] rounded-[4px] transition-all duration-300 hover:bg-[#E5D3B3] active:scale-[0.98] disabled:bg-[#1E1E22] disabled:text-[#48484A] cursor-pointer flex items-center justify-center gap-2 shadow-md"
+                className="w-full py-4.5 text-center text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-[#050505] bg-[#C5A880] rounded-[4px] transition-all duration-300 hover:bg-[#E5D3B3] active:scale-[0.98] disabled:bg-[#1C1812] disabled:text-[#48484A] cursor-pointer flex items-center justify-center gap-2 shadow-md"
               >
                 {isSubmitting ? "ACTIVATING AUTONOMOUS NODE..." : "DEPLOY PROVIDER NODE IN POOL"}
               </button>
 
               {/* Messages */}
               {successMsg && (
-                <div className="p-3 bg-[#0A0A0A] border border-emerald-500/20 rounded-[4px] text-center font-mono text-[9.5px] uppercase text-emerald-400 select-text">
+                <div className="p-4 bg-[#050505] border border-emerald-500/20 rounded-[4px] text-center font-mono text-[9.5px] uppercase text-emerald-400 select-text">
                   {successMsg}
                 </div>
               )}
               {error && (
-                <div className="p-3 bg-[#0A0A0A] border border-red-500/20 rounded-[4px] text-center font-mono text-[9.5px] uppercase text-red-400 select-all">
+                <div className="p-4 bg-[#050505] border border-red-500/20 rounded-[4px] text-center font-mono text-[9.5px] uppercase text-red-400 select-all">
                   {error}
                 </div>
               )}
             </form>
           ) : (
-            <div className="flex flex-col gap-4 bg-[#111111] border border-[#1E1E1E] rounded-[6px] p-6 min-h-[500px]">
+            <div className="flex flex-col gap-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] p-8 min-h-[500px]">
               <h3 className="text-[10px] font-sans font-bold uppercase tracking-wider text-[#E5D3B3] border-b border-[#1E1E1E] pb-3 mb-2">
                 ACTIVE PROVIDER NODES Registry
               </h3>

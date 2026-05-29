@@ -176,48 +176,52 @@ export default function NegotiatePage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto w-full px-8 py-10 flex flex-col gap-8 select-none">
+    <div className="max-w-5xl mx-auto w-full px-8 py-12 flex flex-col gap-8 select-none">
       {/* Top Title Section */}
-      <div className="flex justify-between items-center border-b border-[#1E1E1E] pb-5">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-[12px] font-sans font-bold tracking-[0.18em] uppercase text-[#E5D3B3]">
+      <div className="flex justify-between items-center border-b border-[#1E1E1E] pb-6">
+        <div className="flex flex-col gap-1.5">
+          <h2 className="text-[11px] font-sans font-bold tracking-[0.2em] uppercase text-[#C5A880]">
             Buy Portal & Sourcing Specification
           </h2>
-          <p className="text-[9px] font-sans text-[#8E8E93] uppercase tracking-wider font-semibold">
+          <p className="text-[9px] font-sans text-[#807E78] uppercase tracking-widest font-bold">
             Define contract parameters to launch autonomous negotiation sweeps.
           </p>
         </div>
-        <div className="text-[9px] font-mono text-[#C5A880] uppercase tracking-widest font-extrabold bg-[#111111] border border-[#1E1E1E] rounded-[4px] px-3 py-1 shadow-sm">
+        <div className="text-[8.5px] font-mono text-[#C5A880] uppercase tracking-widest font-extrabold bg-[#0D0D0E] border border-[#1E1E1E] rounded-none px-3 py-1 shadow-sm">
           Node: <span className="text-white">SOURCING_ACTIVE</span>
         </div>
       </div>
 
       {/* Two Column Command Grid (strict gap-6) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Left Column: Sourcing Specification Form */}
         <form 
           onSubmit={handleSubmit} 
-          className="lg:col-span-7 flex flex-col gap-6 bg-[#111111] border border-[#1E1E1E] rounded-[6px] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.4)]"
+          className="lg:col-span-7 premium-form rounded-none relative"
         >
-          {/* Category Dropdown (Sharp rounded-[6px]) */}
-          <div className="flex flex-col gap-2 relative">
-            <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+          {/* Subtle geometric corners */}
+          <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-[#C5A880]/15" />
+          <div className="absolute bottom-2 right-2 w-1.5 h-1.5 border-b border-r border-[#C5A880]/15" />
+
+          {/* Category Dropdown */}
+          <div className="form-group-spacious relative">
+            <label>
               B2B Service Range Category
             </label>
             <div 
               onClick={() => setShowDropdown(!showDropdown)}
-              className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3.5 px-4 text-xs text-[#E5D3B3] font-semibold cursor-pointer flex justify-between items-center transition-all duration-300 focus-within:ring-1 focus-within:ring-[#C5A880]/30"
+              className="w-full bg-[#070708]/80 border border-[#1E1E1E] rounded-none py-4 px-5 text-xs text-[#E5D3B3] font-semibold cursor-pointer flex justify-between items-center transition-all duration-300 hover:border-[#C5A880]/30"
             >
-              <span className="text-[12px] text-[#E5D3B3] font-sans">
+              <span className="text-[11px] text-[#E5D3B3] font-sans font-bold uppercase tracking-widest">
                 {CATEGORIES.find(c => c.value === category)?.label || "Select Category"}
               </span>
-              <span className="text-[#C5A880] text-[9px] tracking-widest">{showDropdown ? "▲" : "▼"}</span>
+              <span className="text-[#C5A880] text-[8px] tracking-widest">{showDropdown ? "▲" : "▼"}</span>
             </div>
             
             {showDropdown && (
-              <div className="absolute top-[62px] left-0 right-0 z-50 bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] shadow-2xl overflow-hidden">
-                <div className="max-h-[220px] overflow-y-auto py-1.5">
+              <div className="absolute top-[78px] left-0 right-0 z-50 bg-[#070708] border border-[#1E1E1E] rounded-none shadow-2xl overflow-hidden animate-fadeIn">
+                <div className="max-h-[220px] overflow-y-auto py-2">
                   {CATEGORIES.map((cat) => (
                     <div 
                       key={cat.value} 
@@ -231,7 +235,7 @@ export default function NegotiatePage() {
                           setTargetPrice(Math.round(defaults.budget * 0.8));
                         }
                       }}
-                      className={`px-4 py-2.5 text-[10px] font-sans font-bold uppercase tracking-wider text-[#8E8E93] hover:text-[#E5D3B3] hover:bg-white/[0.02] cursor-pointer transition-colors ${
+                      className={`px-5 py-3.5 text-[9.5px] font-sans font-bold uppercase tracking-widest text-[#807E78] hover:text-[#C5A880] hover:bg-white/[0.01] cursor-pointer transition-colors ${
                         cat.value === category ? "text-[#C5A880] bg-white/[0.015]" : ""
                       }`}
                     >
@@ -245,14 +249,14 @@ export default function NegotiatePage() {
 
           {/* Sourcing Guide Telemetry Box */}
           {CATEGORY_DEFAULTS[category] && (
-            <div className="text-[9px] font-mono text-[#C5A880]/80 bg-[#C5A880]/[0.02] border border-[#C5A880]/15 rounded-[4px] px-3.5 py-2.5 w-full uppercase tracking-wider font-bold leading-relaxed">
-              ⚡ Sourcing Guide: {CATEGORY_DEFAULTS[category].desc}
+            <div className="text-[8.5px] font-mono text-[#C5A880] bg-[#C5A880]/[0.02] border border-[#C5A880]/15 rounded-none px-4.5 py-4 w-full uppercase tracking-widest font-bold leading-relaxed">
+              [SOURCING PROFILE] {CATEGORY_DEFAULTS[category].desc}
             </div>
           )}
 
           {/* Quantity Field */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+          <div className="form-group-spacious">
+            <label>
               {currentUnit.qtyLabel}
             </label>
             <input
@@ -261,14 +265,14 @@ export default function NegotiatePage() {
               onChange={(e) => setQuantity(Number(e.target.value))}
               min={1}
               required
-              className="w-full bg-[#0A0A0A] border border-[#1E1E1E] focus:border-[#C5A880]/30 rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none transition-all duration-300"
+              className="premium-input"
             />
           </div>
 
           {/* Price side-by-side inputs (Target & Max Budget) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="form-group-spacious">
+              <label>
                 Target Price per Unit (INR)
               </label>
               <input
@@ -277,12 +281,12 @@ export default function NegotiatePage() {
                 onChange={(e) => setTargetPrice(Number(e.target.value))}
                 min={1}
                 required
-                className="w-full bg-[#0A0A0A] border border-[#1E1E1E] focus:border-[#C5A880]/30 rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none transition-all duration-300"
+                className="premium-input"
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+            <div className="form-group-spacious">
+              <label>
                 Max Price per Unit (INR)
               </label>
               <input
@@ -291,17 +295,17 @@ export default function NegotiatePage() {
                 onChange={(e) => setBudgetMax(Number(e.target.value))}
                 min={1}
                 required
-                className="w-full bg-[#0A0A0A] border border-[#1E1E1E] focus:border-[#C5A880]/30 rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none transition-all duration-300"
+                className="premium-input"
               />
             </div>
           </div>
 
           {/* Sourcing Location Hub Pill selection */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+          <div className="form-group-spacious">
+            <label>
               Sourcing Hub State Location
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {SOURCING_HUBS.map((hub) => {
                 const isSelected = locationState === hub;
                 return (
@@ -309,10 +313,10 @@ export default function NegotiatePage() {
                     type="button"
                     key={hub}
                     onClick={() => setLocationState(hub)}
-                    className={`py-2 px-1 text-center text-[9px] uppercase tracking-wider font-extrabold rounded-[4px] border transition-all duration-300 cursor-pointer active:scale-[0.98] ${
+                    className={`py-3 px-1 text-center text-[8.5px] uppercase tracking-widest font-bold rounded-none border transition-all duration-300 cursor-pointer active:scale-[0.98] ${
                       isSelected
-                        ? "bg-[#C5A880] border-[#C5A880] text-[#050505] shadow-md"
-                        : "bg-[#0A0A0A] border-[#1E1E1E] text-[#8E8E93] hover:text-[#E5D3B3] hover:border-[#C5A880]/20"
+                        ? "bg-[#C5A880] border-[#C5A880] text-[#070708] shadow-sm font-extrabold"
+                        : "bg-[#070708] border-[#1E1E1E] text-[#807E78] hover:text-[#E5D3B3] hover:border-[#C5A880]/20"
                     }`}
                   >
                     {hub.split(" ")[0]}
@@ -323,41 +327,41 @@ export default function NegotiatePage() {
           </div>
 
           {/* Urgency and Payment preference row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="form-group-spacious">
+              <label>
                 Urgency Level
               </label>
               <select
                 value={urgency}
                 onChange={(e) => setUrgency(e.target.value)}
-                className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3 px-3.5 text-[11px] font-sans text-[#E5D3B3] font-semibold focus:outline-none cursor-pointer"
+                className="w-full bg-[#070708]/80 border border-[#1E1E1E] rounded-none py-4 px-5 text-[10px] font-mono uppercase tracking-widest text-[#E5D3B3] font-bold focus:outline-none cursor-pointer hover:border-[#C5A880]/20 transition-all"
               >
                 {URGENCY_LEVELS.map((u) => (
-                  <option key={u} value={u} className="bg-[#0A0A0A] text-[#E5D3B3] py-2 uppercase">{u.toUpperCase()}</option>
+                  <option key={u} value={u} className="bg-[#070708] text-[#E5D3B3] py-2 uppercase font-bold">{u.toUpperCase()}</option>
                 ))}
               </select>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+            <div className="form-group-spacious">
+              <label>
                 Payment Terms Preference
               </label>
               <select
                 value={paymentPreference}
                 onChange={(e) => setPaymentPreference(e.target.value)}
-                className="w-full bg-[#0A0A0A] border border-[#1E1E1E] rounded-[6px] py-3 px-3.5 text-[11px] font-sans text-[#E5D3B3] font-semibold focus:outline-none cursor-pointer"
+                className="w-full bg-[#070708]/80 border border-[#1E1E1E] rounded-none py-4 px-5 text-[10px] font-mono uppercase tracking-widest text-[#E5D3B3] font-bold focus:outline-none cursor-pointer hover:border-[#C5A880]/20 transition-all"
               >
                 {PAYMENT_TERMS.map((pt) => (
-                  <option key={pt.value} value={pt.value} className="bg-[#0A0A0A] text-[#E5D3B3] py-2">{pt.label}</option>
+                  <option key={pt.value} value={pt.value} className="bg-[#070708] text-[#E5D3B3] py-2 uppercase font-bold">{pt.label}</option>
                 ))}
               </select>
             </div>
           </div>
 
           {/* Delivery Days Max */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+          <div className="form-group-spacious">
+            <label>
               Maximum Delivery / Engagement Setup Period (Days)
             </label>
             <input
@@ -366,16 +370,16 @@ export default function NegotiatePage() {
               onChange={(e) => setDeliveryDaysMax(Number(e.target.value))}
               min={1}
               required
-              className="w-full bg-[#0A0A0A] border border-[#1E1E1E] focus:border-[#C5A880]/30 rounded-[6px] py-3.5 px-4 text-xs font-mono text-white/90 focus:outline-none transition-all duration-300"
+              className="premium-input"
             />
           </div>
 
           {/* Quality Grade Grid */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+          <div className="form-group-spacious">
+            <label>
               Minimum Provider Quality Grade
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-3">
               {QUALITY_GRADES.map((grade) => {
                 const isSelected = qualityMin === grade;
                 return (
@@ -383,10 +387,10 @@ export default function NegotiatePage() {
                     type="button"
                     key={grade}
                     onClick={() => setQualityMin(grade)}
-                    className={`py-2.5 px-4 text-center text-[9px] uppercase tracking-widest font-extrabold rounded-[4px] border transition-all duration-300 cursor-pointer active:scale-[0.98] ${
+                    className={`py-3.5 px-4 text-center text-[8.5px] uppercase tracking-widest font-bold rounded-none border transition-all duration-300 cursor-pointer active:scale-[0.98] ${
                       isSelected
-                        ? "bg-[#C5A880] border-[#C5A880] text-[#050505] shadow-md"
-                        : "bg-[#0A0A0A] border-[#1E1E1E] text-[#8E8E93] hover:border-[#C5A880]/20"
+                        ? "bg-[#C5A880] border-[#C5A880] text-[#070708] font-extrabold"
+                        : "bg-[#070708] border-[#1E1E1E] text-[#807E78] hover:border-[#C5A880]/20"
                     }`}
                   >
                     Grade {grade}
@@ -397,11 +401,11 @@ export default function NegotiatePage() {
           </div>
 
           {/* Required Certifications Multi-select */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+          <div className="form-group-spacious">
+            <label>
               Required Compliance Certifications
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5">
               {CERTIFICATIONS.map((cert) => {
                 const isSelected = selectedCerts.includes(cert);
                 return (
@@ -409,13 +413,13 @@ export default function NegotiatePage() {
                     type="button"
                     key={cert}
                     onClick={() => handleCertToggle(cert)}
-                    className={`py-2 px-3 text-[9px] font-mono font-bold rounded-[4px] border transition-all duration-200 cursor-pointer ${
+                    className={`py-2.5 px-4 text-[8.5px] font-mono font-bold rounded-none border transition-all duration-200 cursor-pointer ${
                       isSelected
-                        ? "bg-white/[0.04] border-[#C5A880] text-[#C5A880]"
-                        : "bg-[#0A0A0A] border-[#1E1E1E] text-[#8E8E93] hover:text-white"
+                        ? "bg-white/[0.03] border-[#C5A880] text-[#C5A880]"
+                        : "bg-[#070708] border-[#1E1E1E] text-[#807E78] hover:text-white"
                     }`}
                   >
-                    {isSelected ? "✔ " : "+ "} {cert}
+                    {isSelected ? "[SELECTED] " : "[+ ] "} {cert}
                   </button>
                 );
               })}
@@ -423,65 +427,65 @@ export default function NegotiatePage() {
           </div>
 
           {/* MOQ & Partial fulfillment checkboxes */}
-          <div className="flex flex-col gap-3 py-3 border-t border-b border-[#1E1E1E]">
-            <label className="flex items-center gap-3 cursor-pointer group/label">
+          <div className="flex flex-col gap-4.5 py-5 border-t border-b border-[#1E1E1E]">
+            <label className="flex items-center gap-3.5 cursor-pointer group/label">
               <input
                 type="checkbox"
                 checked={moqWaiver}
                 onChange={(e) => setMoqWaiver(e.target.checked)}
-                className="w-4 h-4 rounded-[4px] accent-[#C5A880] bg-[#0A0A0A] border-[#1E1E1E]"
+                className="w-3.5 h-3.5 rounded-none accent-[#C5A880] bg-[#070708] border-[#1E1E1E]"
               />
-              <span className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93] group-hover/label:text-[#E5D3B3] transition-colors">
+              <span className="text-[9.5px] font-sans font-bold uppercase tracking-widest text-[#807E78] group-hover/label:text-[#E5D3B3] transition-colors">
                 Allow Minimum Order Quantity (MOQ) Waiver
               </span>
             </label>
 
-            <label className="flex items-center gap-3 cursor-pointer group/label">
+            <label className="flex items-center gap-3.5 cursor-pointer group/label">
               <input
                 type="checkbox"
                 checked={partialFulfillment}
                 onChange={(e) => setPartialFulfillment(e.target.checked)}
-                className="w-4 h-4 rounded-[4px] accent-[#C5A880] bg-[#0A0A0A] border-[#1E1E1E]"
+                className="w-3.5 h-3.5 rounded-none accent-[#C5A880] bg-[#070708] border-[#1E1E1E]"
               />
-              <span className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93] group-hover/label:text-[#E5D3B3] transition-colors">
+              <span className="text-[9.5px] font-sans font-bold uppercase tracking-widest text-[#807E78] group-hover/label:text-[#E5D3B3] transition-colors">
                 Allow Partial Service Delivery / Stock Allocation
               </span>
             </label>
           </div>
 
           {/* AI strategy critique */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <button
               type="button"
               onClick={handlePredictSuccess}
               disabled={isCritiquing}
-              className="text-left text-[9px] font-mono font-bold uppercase tracking-wider text-[#C5A880] hover:text-[#E5D3B3] transition-colors cursor-pointer select-none bg-transparent border-none flex items-center gap-1.5"
+              className="text-left text-[8.5px] font-mono font-bold uppercase tracking-widest text-[#C5A880] hover:text-[#E5D3B3] transition-colors cursor-pointer select-none bg-transparent border-none flex items-center gap-1.5"
             >
-              {isCritiquing ? "Analyzing sourcing spec..." : "🔮 Run AI Sourcing Strategy critique"}
+              {isCritiquing ? "Analyzing sourcing spec..." : "[AI CRITIQUE] Run Sourcing Strategy Critique"}
             </button>
             {critique && (
-              <div className="p-3 bg-[#0A0A0A] border border-[#1E1E1E] rounded-[4px] text-[9.5px] font-mono text-[#E5D3B3] uppercase leading-relaxed tracking-wide select-text">
+              <div className="p-4 bg-[#070708] border border-[#1E1E1E] rounded-none text-[9px] font-mono text-[#E5D3B3] uppercase leading-relaxed tracking-widest select-text">
                 {critique}
               </div>
             )}
           </div>
 
           {/* Dynamic Telemetry calculator Summary Card */}
-          <div className="p-4.5 bg-[#0A0A0A] border border-[#1E1E1E] rounded-[4px] flex flex-col gap-2">
-            <div className="text-[9px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8E93] border-b border-[#1E1E1E] pb-2">
+          <div className="p-6 bg-[#070708] border border-[#1E1E1E] rounded-none flex flex-col gap-3">
+            <div className="text-[8.5px] font-sans font-bold uppercase tracking-widest text-[#807E78] border-b border-[#1E1E1E] pb-2">
               Sourcing Volume Estimate
             </div>
-            <div className="grid grid-cols-2 gap-3.5 pt-1 text-[11px] font-mono text-white/90">
+            <div className="grid grid-cols-2 gap-4.5 pt-1.5 text-[10.5px] font-mono text-white/90">
               <div>
-                <span className="text-[#8E8E93] font-sans text-[8.5px] uppercase block">Target Contract Value</span>
+                <span className="text-[#807E78] font-sans text-[8px] uppercase block font-bold">Target Contract Value</span>
                 <span className="font-bold tabular-nums">{formatCurrency(targetContractValue)}</span>
               </div>
               <div>
-                <span className="text-[#8E8E93] font-sans text-[8.5px] uppercase block">Max Budget limit</span>
+                <span className="text-[#807E78] font-sans text-[8px] uppercase block font-bold">Max Budget limit</span>
                 <span className="font-bold tabular-nums">{formatCurrency(maxContractValue)}</span>
               </div>
-              <div className="col-span-2 flex justify-between items-center border-t border-[#1E1E1E]/50 pt-2 text-[9.5px]">
-                <span className="text-[#8E8E93] font-sans text-[8.5px] uppercase font-bold">Estimated Sourcing Scope Tier</span>
+              <div className="col-span-2 flex justify-between items-center border-t border-[#1E1E1E] pt-3 text-[9px]">
+                <span className="text-[#807E78] font-sans text-[8px] uppercase font-bold">Estimated Sourcing Scope Tier</span>
                 <span className="text-[#C5A880] font-black">{sourcingTier}</span>
               </div>
             </div>
@@ -491,32 +495,32 @@ export default function NegotiatePage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3.5 text-center text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-[#050505] bg-[#C5A880] hover:bg-[#E5D3B3] rounded-[4px] transition-all duration-300 active:scale-[0.98] disabled:bg-[#1E1E22] disabled:text-[#48484A] cursor-pointer flex items-center justify-center gap-2 shadow-md"
+            className="w-full py-4.5 text-center text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-[#070708] bg-[#C5A880] hover:bg-[#E5D3B3] rounded-none transition-all duration-300 active:scale-[0.98] disabled:bg-[#1E1E1E] disabled:text-[#48484A] cursor-pointer flex items-center justify-center gap-2"
           >
             {isSubmitting ? "STARTING SOURCING AGENTS..." : "START AUTONOMOUS B2B SOURCING"}
           </button>
 
           {/* Error Message */}
           {error && (
-            <div className="p-3 bg-[#0A0A0A] border border-red-500/20 rounded-[4px] text-center font-mono text-[9.5px] uppercase text-red-400 select-all">
+            <div className="p-4 bg-[#070708] border border-red-500/20 rounded-none text-center font-mono text-[9px] uppercase text-red-400 select-all">
               {error}
             </div>
           )}
         </form>
 
         {/* Right Column: AI Preview & Sourcing Radar Dial */}
-        <div className="lg:col-span-5 bg-[#111111] border border-[#1E1E1E] rounded-[6px] p-6 flex flex-col justify-between min-h-[520px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] relative overflow-hidden group">
+        <div className="lg:col-span-5 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none p-6 flex flex-col justify-between min-h-[520px] relative overflow-hidden group">
           {/* Subtle Ambient Corner Glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-[#C5A880]/[0.02] rounded-full blur-[80px] pointer-events-none" />
 
           {/* HUD details */}
-          <div className="absolute top-4 left-4 w-1.5 h-1.5 border-t border-l border-[#C5A880]/20" />
-          <div className="absolute top-4 right-4 w-1.5 h-1.5 border-t border-r border-[#C5A880]/20" />
-          <div className="absolute bottom-4 left-4 w-1.5 h-1.5 border-b border-l border-[#C5A880]/20" />
-          <div className="absolute bottom-4 right-4 w-1.5 h-1.5 border-b border-r border-[#C5A880]/20" />
+          <div className="absolute top-4 left-4 w-1.5 h-1.5 border-t border-l border-[#C5A880]/15" />
+          <div className="absolute top-4 right-4 w-1.5 h-1.5 border-t border-r border-[#C5A880]/15" />
+          <div className="absolute bottom-4 left-4 w-1.5 h-1.5 border-b border-l border-[#C5A880]/15" />
+          <div className="absolute bottom-4 right-4 w-1.5 h-1.5 border-b border-r border-[#C5A880]/15" />
 
-          <div className="flex flex-col gap-1 border-b border-[#1E1E1E] pb-3 select-none">
-            <h3 className="text-[10px] font-sans font-bold uppercase tracking-[0.15em] text-[#8E8E93]">
+          <div className="flex flex-col gap-1 border-b border-[#1E1E1E] pb-3.5 select-none">
+            <h3 className="text-[10px] font-sans font-bold uppercase tracking-[0.18em] text-[#807E78]">
               AI Preview
             </h3>
           </div>
@@ -562,17 +566,14 @@ export default function NegotiatePage() {
               </g>
 
               {/* Orbiting Active Negotiation Nodes */}
-              {/* Node 1 */}
               <g className="animate-pulse" style={{ animationDuration: '3s' }}>
                 <circle cx="65" cy="65" r="4.5" fill="#C5A880" fillOpacity="0.15" />
                 <circle cx="65" cy="65" r="1.5" fill="#E5D3B3" />
               </g>
-              {/* Node 2 */}
               <g className="animate-pulse" style={{ animationDuration: '4.5s' }}>
                 <circle cx="150" cy="100" r="5" fill="#C5A880" fillOpacity="0.2" />
                 <circle cx="150" cy="100" r="2" fill="#C5A880" />
               </g>
-              {/* Node 3 */}
               <g className="animate-pulse" style={{ animationDuration: '2.5s' }}>
                 <circle cx="100" cy="150" r="4" fill="#E5D3B3" fillOpacity="0.15" />
                 <circle cx="100" cy="150" r="1.5" fill="#FFFFFF" />
@@ -585,29 +586,29 @@ export default function NegotiatePage() {
             </svg>
           </div>
 
-          {/* Sourcing Stats Bullet details matching mockup exactly */}
+          {/* Sourcing Stats Bullet details */}
           <div className="flex flex-col gap-5 w-full border-t border-[#1E1E1E] pt-5 text-[11px] font-sans">
             <div className="flex items-start gap-4">
               <span className="text-[#C5A880] mt-0.5 text-xs">☉</span>
               <div className="flex flex-col gap-0.5">
-                <h4 className="font-extrabold uppercase tracking-wider text-[#E5D3B3] text-[10px] font-sans">Parallel Negotiations</h4>
-                <p className="text-[#8E8E93] text-[9.5px] leading-relaxed font-semibold uppercase">Agents will negotiate with multiple sellers simultaneously</p>
+                <h4 className="font-extrabold uppercase tracking-widest text-[#E5D3B3] text-[9.5px] font-sans">Parallel Negotiations</h4>
+                <p className="text-[#807E78] text-[9px] leading-relaxed font-bold uppercase tracking-wider">Agents will negotiate with multiple sellers simultaneously</p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
               <span className="text-[#C5A880] mt-0.5 text-xs">☉</span>
               <div className="flex flex-col gap-0.5">
-                <h4 className="font-extrabold uppercase tracking-wider text-[#E5D3B3] text-[10px] font-sans">Expected Response</h4>
-                <p className="text-[#8E8E93] text-[9.5px] leading-relaxed font-semibold uppercase">Results in under 120 seconds</p>
+                <h4 className="font-extrabold uppercase tracking-widest text-[#E5D3B3] text-[9.5px] font-sans">Expected Response</h4>
+                <p className="text-[#807E78] text-[9px] leading-relaxed font-bold uppercase tracking-wider">Results in under 120 seconds</p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
               <span className="text-[#C5A880] mt-0.5 text-xs">☉</span>
               <div className="flex flex-col gap-0.5">
-                <h4 className="font-extrabold uppercase tracking-wider text-[#E5D3B3] text-[10px] font-sans">Intelligence Pass</h4>
-                <p className="text-[#8E8E93] text-[9.5px] leading-relaxed font-semibold uppercase">Dual-layer validation for fit and credibility</p>
+                <h4 className="font-extrabold uppercase tracking-widest text-[#E5D3B3] text-[9.5px] font-sans">Intelligence Pass</h4>
+                <p className="text-[#807E78] text-[9px] leading-relaxed font-bold uppercase tracking-wider">Dual-layer validation for fit and credibility</p>
               </div>
             </div>
           </div>

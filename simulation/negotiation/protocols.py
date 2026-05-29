@@ -18,7 +18,7 @@ Key upgrades over v2:
 import asyncio
 import time
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Any
 
 from simulation.negotiation.strategies import (
     NegotiationStrategy, Offer, get_strategy,
@@ -26,6 +26,9 @@ from simulation.negotiation.strategies import (
     _sanitize_for_llm,
 )
 from simulation.negotiation.ranking import NegotiatedDeal
+from simulation.negotiation.event_sourced_ledger import (
+    SessionStartedEvent, OfferProposedEvent, DealClosedEvent, SessionFailedEvent
+)
 
 
 @dataclass
@@ -95,6 +98,12 @@ class NegotiationSession:
     final_offer_used: bool = False
     injection_blocked: int = 0          # count of sanitized suspicious inputs
 
+    # Event log journal
+    journal: Optional[Any] = None
+
+    # Distributed event streaming
+    stream_enabled: bool = False
+
 
 QUALITY_RANK = {"C": 0, "B": 1, "A": 2}
 
@@ -122,6 +131,42 @@ async def run_negotiation(session: NegotiationSession) -> NegotiatedDeal:
     Returns a NegotiatedDeal (deal_reached=True/False).
     """
     start_time = time.monotonic()
+
+    if session.journal is not None:
+        session.journal.append(SessionStartedEvent(
+            event_type="session_started",
+            session_id=session.session_id,
+            timestamp=time.time(),
+            buyer_id=session.buyer_id,
+            seller_id=session.seller_id,
+            buyer_target_price=session.buyer_target_price,
+            buyer_max_price=session.buyer_max_price,
+            buyer_quantity=session.buyer_quantity,
+            seller_floor_price=session.seller_floor_price,
+            seller_list_price=session.seller_list_price,
+            seller_moq=session.seller_moq,
+            category=session.category
+        ))
+
+    if session.stream_enabled:
+        from db.stream_client import get_stream_client
+        get_stream_client().publish(
+            topic="negotiation_lifecycle",
+            key=session.session_id,
+            event_data={
+                "event_type": "session_started",
+                "session_id": session.session_id,
+                "buyer_id": session.buyer_id,
+                "seller_id": session.seller_id,
+                "buyer_target_price": session.buyer_target_price,
+                "buyer_max_price": session.buyer_max_price,
+                "buyer_quantity": session.buyer_quantity,
+                "seller_floor_price": session.seller_floor_price,
+                "seller_list_price": session.seller_list_price,
+                "seller_moq": session.seller_moq,
+                "category": session.category
+            }
+        )
 
     # ── Pre-negotiation hard checks ──────────────────────────────────────────
     if session.seller_blacklisted:
@@ -225,14 +270,14 @@ async def run_negotiation(session: NegotiationSession) -> NegotiatedDeal:
         is_final_round = round_num >= session.max_rounds - 1
 
         # ── Buyer makes offer ────────────────────────────────────────────────
-        buyer_price = buyer_strat.make_offer(
-            round_num, session.max_rounds,
-            session.buyer_target_price,
-            effective_buyer_max,
-            current_seller_offer,
-        )
+        # Corrected buyer concession direction (Single Source of Truth refactored)
+        factor = buyer_strat.concession_factor(round_num, session.max_rounds)
+        buyer_price = session.buyer_target_price + (effective_buyer_max - session.buyer_target_price) * factor
         # Buyers never offer above their effective ceiling (guards Aspirational anchoring)
         buyer_price = min(buyer_price, effective_buyer_max)
+        # Buyers never offer above 1.05 * BATNA if BATNA is known
+        if session.buyer_batna_price is not None:
+            buyer_price = min(buyer_price, session.buyer_batna_price * 1.05)
         # No rational buyer pays above list price either
         if session.seller_list_price > 0:
             buyer_price = min(buyer_price, session.seller_list_price)
@@ -247,6 +292,37 @@ async def run_negotiation(session: NegotiationSession) -> NegotiatedDeal:
             is_final=is_final_round,
         )
         session.offers.append(current_buyer_offer)
+        if session.journal is not None:
+            session.journal.append(OfferProposedEvent(
+                event_type="offer_proposed",
+                session_id=session.session_id,
+                timestamp=time.time(),
+                round_number=round_num,
+                from_agent=session.buyer_id,
+                price=buyer_price,
+                quantity=actual_qty,
+                delivery_days=session.buyer_deadline_days,
+                payment_term=common_payment,
+                is_final=is_final_round
+            ))
+
+        if session.stream_enabled:
+            from db.stream_client import get_stream_client
+            get_stream_client().publish(
+                topic="negotiation_lifecycle",
+                key=session.session_id,
+                event_data={
+                    "event_type": "offer_proposed",
+                    "session_id": session.session_id,
+                    "round_number": round_num,
+                    "from_agent": session.buyer_id,
+                    "price": buyer_price,
+                    "quantity": actual_qty,
+                    "delivery_days": session.buyer_deadline_days,
+                    "payment_term": common_payment,
+                    "is_final": is_final_round
+                }
+            )
 
         # ── Seller evaluates buyer offer (only if price above floor) ─────────
         if buyer_price >= adjusted_floor:
@@ -255,17 +331,9 @@ async def run_negotiation(session: NegotiationSession) -> NegotiatedDeal:
                                   round_num, "seller_accepted", adjusted_floor,
                                   delivery_days=agreed_delivery)
 
-        # ── Seller makes counter-offer ────────────────────────────────────────
-        # Note: seller ALWAYS makes a counter even if buyer offered below floor.
-        # This allows buyer to accept seller's counter in the same round.
-        seller_price = seller_strat.make_offer(
-            round_num, session.max_rounds,
-            adjusted_floor,
-            session.seller_list_price,
-            current_buyer_offer,
-        )
-        # Seller NEVER goes below adjusted floor; NEVER above list price
-        seller_price = max(adjusted_floor, min(session.seller_list_price or seller_price, seller_price))
+        factor = seller_strat.concession_factor(round_num, session.max_rounds)
+        seller_price = session.seller_list_price - (session.seller_list_price - adjusted_floor) * factor
+        seller_price = round(max(adjusted_floor, min(session.seller_list_price, seller_price)), 2)
 
         current_seller_offer = Offer(
             price=seller_price,
@@ -277,8 +345,44 @@ async def run_negotiation(session: NegotiationSession) -> NegotiatedDeal:
             is_final=is_final_round,
         )
         session.offers.append(current_seller_offer)
+        if session.journal is not None:
+            session.journal.append(OfferProposedEvent(
+                event_type="offer_proposed",
+                session_id=session.session_id,
+                timestamp=time.time(),
+                round_number=round_num,
+                from_agent=session.seller_id,
+                price=seller_price,
+                quantity=actual_qty,
+                delivery_days=agreed_delivery,
+                payment_term=common_payment,
+                is_final=is_final_round
+            ))
 
-        if seller_price <= effective_buyer_max:
+        if session.stream_enabled:
+            from db.stream_client import get_stream_client
+            get_stream_client().publish(
+                topic="negotiation_lifecycle",
+                key=session.session_id,
+                event_data={
+                    "event_type": "offer_proposed",
+                    "session_id": session.session_id,
+                    "round_number": round_num,
+                    "from_agent": session.seller_id,
+                    "price": seller_price,
+                    "quantity": actual_qty,
+                    "delivery_days": agreed_delivery,
+                    "payment_term": common_payment,
+                    "is_final": is_final_round
+                }
+            )
+
+        # Track if seller offer is BATNA acceptable
+        is_batna_acceptable = True
+        if session.buyer_batna_price is not None and seller_price > session.buyer_batna_price * 1.05:
+            is_batna_acceptable = False
+
+        if seller_price <= effective_buyer_max and is_batna_acceptable:
             best_price_so_far = seller_price
 
         # ── BATNA check: walk away if seller offer much worse than best known ─
@@ -298,13 +402,14 @@ async def run_negotiation(session: NegotiationSession) -> NegotiatedDeal:
         if (urgency_accept_threshold > session.buyer_target_price
                 and seller_price <= urgency_accept_threshold
                 and seller_price <= effective_buyer_max
+                and is_batna_acceptable
                 and round_num >= 2):
             return _make_deal(session, seller_price, actual_qty, common_payment,
                               round_num, "urgency_early_accept", adjusted_floor,
                               delivery_days=agreed_delivery)
 
         # ── Buyer evaluates seller counter ────────────────────────────────────
-        if seller_price <= effective_buyer_max:
+        if seller_price <= effective_buyer_max and is_batna_acceptable:
             return _make_deal(session, seller_price, actual_qty, common_payment,
                               round_num, "buyer_accepted", adjusted_floor,
                               delivery_days=agreed_delivery)
@@ -330,7 +435,11 @@ async def run_negotiation(session: NegotiationSession) -> NegotiatedDeal:
                     if faster_delivery < agreed_delivery:
                         # Accept at seller's floor with faster delivery
                         deal_price = min(seller_price, effective_buyer_max)
-                        if deal_price >= adjusted_floor:
+                        is_batna_acceptable = True
+                        if session.buyer_batna_price is not None and deal_price > session.buyer_batna_price * 1.05:
+                            is_batna_acceptable = False
+                            
+                        if deal_price >= adjusted_floor and is_batna_acceptable:
                             agreed_delivery = faster_delivery
                             session.multi_dim_trade = "delivery_trade"
                             return _make_deal(session, deal_price, actual_qty, common_payment,
@@ -341,7 +450,11 @@ async def run_negotiation(session: NegotiationSession) -> NegotiatedDeal:
                 if (session.buyer_payment_pref in ("net_30", "net_60")
                         and "advance_50" in session.seller_payment_terms):
                     payment_trade_price = adjusted_floor * 1.02  # seller gets 2% premium
-                    if payment_trade_price <= effective_buyer_max:
+                    is_batna_acceptable = True
+                    if session.buyer_batna_price is not None and payment_trade_price > session.buyer_batna_price * 1.05:
+                        is_batna_acceptable = False
+                        
+                    if payment_trade_price <= effective_buyer_max and is_batna_acceptable:
                         session.multi_dim_trade = "payment_trade"
                         return _make_deal(session, payment_trade_price, actual_qty,
                                           "advance_50", round_num, "payment_trade",
@@ -393,14 +506,27 @@ async def run_negotiation(session: NegotiationSession) -> NegotiatedDeal:
                 )
                 session.llm_tokens_used += tokens
                 if llm_price is not None:
-                    return _make_deal(session, llm_price, actual_qty, common_payment,
-                                      session.max_rounds, "llm_mediated", adjusted_floor,
-                                      delivery_days=agreed_delivery)
+                    # Clamp to ZOPA bounds
+                    clamped_price = max(adjusted_floor, min(effective_buyer_max, llm_price))
+                    # Validate: adjusted_floor <= compromise_price <= effective_buyer_max
+                    is_batna_acceptable = True
+                    if session.buyer_batna_price is not None and clamped_price > session.buyer_batna_price * 1.05:
+                        is_batna_acceptable = False
+                        
+                    if adjusted_floor <= clamped_price <= effective_buyer_max and is_batna_acceptable:
+                        return _make_deal(session, clamped_price, actual_qty, common_payment,
+                                          session.max_rounds, "llm_mediated", adjusted_floor,
+                                          delivery_days=agreed_delivery)
 
         # Mechanical ZOPA fallback (LLM unavailable or out of range)
         midpoint = zopa_midpoint(zopa_ceiling, adjusted_floor, session.buyer_target_price)
-        if midpoint <= effective_buyer_max:
-            return _make_deal(session, midpoint, actual_qty, common_payment,
+        clamped_midpoint = max(adjusted_floor, min(effective_buyer_max, midpoint))
+        is_batna_acceptable = True
+        if session.buyer_batna_price is not None and clamped_midpoint > session.buyer_batna_price * 1.05:
+            is_batna_acceptable = False
+            
+        if clamped_midpoint <= effective_buyer_max and is_batna_acceptable:
+            return _make_deal(session, clamped_midpoint, actual_qty, common_payment,
                               session.max_rounds, "zopa_fallback", adjusted_floor,
                               delivery_days=agreed_delivery)
 
@@ -522,6 +648,44 @@ def _make_deal(
     deal.injection_blocked = session.injection_blocked
     deal.deadline_pressure_applied = session.buyer_urgency in ("high", "urgent")
 
+    if session.journal is not None:
+        session.journal.append(DealClosedEvent(
+            event_type="deal_closed",
+            session_id=session.session_id,
+            timestamp=time.time(),
+            final_price=round(price, 2),
+            quantity=quantity,
+            delivery_days=delivery_days,
+            payment_term=payment_term,
+            rounds_taken=rounds,
+            savings_pct=round(savings_pct, 2),
+            moq_waiver=session.moq_waiver_applied,
+            partial_fulfillment=session.partial_fulfillment,
+            multi_dim_trade=session.multi_dim_trade,
+            close_reason=reason
+        ))
+
+    if session.stream_enabled:
+        from db.stream_client import get_stream_client
+        get_stream_client().publish(
+            topic="negotiation_lifecycle",
+            key=session.session_id,
+            event_data={
+                "event_type": "deal_closed",
+                "session_id": session.session_id,
+                "final_price": round(price, 2),
+                "quantity": quantity,
+                "delivery_days": delivery_days,
+                "payment_term": payment_term,
+                "rounds_taken": rounds,
+                "savings_pct": round(savings_pct, 2),
+                "moq_waiver": session.moq_waiver_applied,
+                "partial_fulfillment": session.partial_fulfillment,
+                "multi_dim_trade": session.multi_dim_trade,
+                "close_reason": reason
+            }
+        )
+
     session.deal = deal
     return deal
 
@@ -553,6 +717,30 @@ def _failed_deal(session: NegotiationSession, reason: str) -> NegotiatedDeal:
     deal.final_offer_signaling = session.final_offer_used
     deal.injection_blocked = session.injection_blocked
     deal.deadline_pressure_applied = session.buyer_urgency in ("high", "urgent")
+
+    if session.journal is not None:
+        session.journal.append(SessionFailedEvent(
+            event_type="session_failed",
+            session_id=session.session_id,
+            timestamp=time.time(),
+            failure_reason=reason,
+            rounds_taken=session.current_round,
+            price_gap_pct=deal.price_gap_pct
+        ))
+
+    if session.stream_enabled:
+        from db.stream_client import get_stream_client
+        get_stream_client().publish(
+            topic="negotiation_lifecycle",
+            key=session.session_id,
+            event_data={
+                "event_type": "session_failed",
+                "session_id": session.session_id,
+                "failure_reason": reason,
+                "rounds_taken": session.current_round,
+                "price_gap_pct": deal.price_gap_pct
+            }
+        )
 
     session.deal = deal
     return deal

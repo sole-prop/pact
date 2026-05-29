@@ -1,13 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0A0A0A;
-  --foreground: #F2F2F7;
+  /* Centralized Color Tokens (Carbon Matrix) */
+  --background-base: #070708;
+  --background-surface: #0D0D0E;
+  --border-thin: #1E1E1E;
+  --accent-gold: #C5A880;
+  --accent-cream: #E5D3B3;
+  --text-primary: #E5E5E7;
+  --text-secondary: #807E78;
+  --text-tertiary: #48484A;
+
+  /* Spacing Scale (8px Grid Core) */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--background-base);
+  --color-foreground: var(--text-primary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -19,39 +38,230 @@
 }
 
 body {
-  background: #0A0A0A;
-  color: #F2F2F7;
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--background-base);
+  background-image: radial-gradient(circle at 50% 0%, #161619 0%, var(--background-base) 100%);
+  color: var(--text-primary);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* Custom minimal scrollbar */
-::-webkit-scrollbar {
+/* ──────────────────────────────────────────────────────── */
+/* SYSTEM TYPOGRAPHY CLASSES (Strict Architecture Tiers)   */
+/* ──────────────────────────────────────────────────────── */
+
+/* Tier 1: Large Sourcing Headlines */
+.command-header {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 200;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: var(--accent-cream);
+}
+
+.command-header-bold {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+}
+
+/* Tier 2: Section Deck Sub-Titles */
+.section-deck-title {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+/* Tier 3: Tactical Labels & Monospaced Metadata */
+.telemetry-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Tier 4: Large Telemetry Numbers & Counter Telemetries */
+.telemetry-num {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Tier 5: High-Performance Body Copy */
+.tactical-desc {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ──────────────────────────────────────────────────────── */
+/* GEOMETRY, CARDS, AND SURFACES                            */
+/* ──────────────────────────────────────────────────────── */
+
+/* Telemetry HUD Panel Box */
+.telemetry-card {
+  border: 1px solid var(--border-thin);
+  background-color: var(--background-surface);
+  position: relative;
+  border-radius: 0px;
+  padding: var(--space-lg);
+  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.telemetry-card:hover {
+  border-color: rgba(197, 168, 128, 0.2);
+  background-color: rgba(197, 168, 128, 0.005);
+}
+
+/* Absolute hairline corner ticks */
+.corner-tick-tl {
+  position: absolute;
+  top: 8px;
+  left: 8px;
   width: 6px;
   height: 6px;
+  border-top: 1px solid rgba(197, 168, 128, 0.15);
+  border-left: 1px solid rgba(197, 168, 128, 0.15);
+  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.telemetry-card:hover .corner-tick-tl {
+  border-color: rgba(197, 168, 128, 0.4);
+}
+
+.corner-tick-br {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-bottom: 1px solid rgba(197, 168, 128, 0.15);
+  border-right: 1px solid rgba(197, 168, 128, 0.15);
+  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.telemetry-card:hover .corner-tick-br {
+  border-color: rgba(197, 168, 128, 0.4);
+}
+
+/* ──────────────────────────────────────────────────────── */
+/* TABLE & FORM CONTROLS                                    */
+/* ──────────────────────────────────────────────────────── */
+
+.premium-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-thin);
+  border-radius: 0px;
+  background-color: var(--background-surface);
+}
+
+table.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+table.premium-table th {
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-thin);
+  font-weight: 700;
+  background-color: rgba(30, 30, 30, 0.15);
+}
+
+table.premium-table td {
+  padding: var(--space-lg);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(30, 30, 30, 0.4);
+  transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+table.premium-table tr:hover td {
+  background-color: rgba(197, 168, 128, 0.015);
+  color: #FFFFFF;
+}
+
+table.premium-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Inputs & Form layout styles */
+.premium-input {
+  width: 100%;
+  background-color: rgba(7, 7, 8, 0.5);
+  border: 1px solid var(--border-thin);
+  border-radius: 0px;
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #FFFFFF;
+  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.premium-input:focus {
+  outline: none;
+  border-color: rgba(197, 168, 128, 0.5);
+  box-shadow: 0 0 12px rgba(197, 168, 128, 0.05);
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0A0A0A;
+  background: var(--background-base);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E1E1E;
-  border-radius: 3px;
+  background: var(--border-thin);
+  border-radius: 0px;
+  transition: background-color 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #48484A;
+  background: var(--accent-gold);
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-/* Premium Focus Ring Styling */
 *:focus-visible {
-  outline: 1px solid #C5A880;
+  outline: 1px solid var(--accent-gold);
   outline-offset: 2px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

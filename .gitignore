@@ -67,3 +67,13 @@ Desktop.ini
 
 # AI Coding Assistant Settings
 .claude/
+
+# PACT — Release Telemetry & Temporary Logs Exclusions
+.gemini/
+.claude/
+.system_generated/
+scratch/
+simulation/reports/*.json
+simulation/reports/*.txt
+simulation/data/*.json
+simulation/data/*.db

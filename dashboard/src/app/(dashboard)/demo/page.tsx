@@ -8,7 +8,8 @@ import { CategoryGrid } from "@/components/demo/CategoryGrid";
 import { ProgressionChart } from "@/components/demo/ProgressionChart";
 import { AutomotiveReportView } from "@/components/demo/AutomotiveReportView";
 import { api } from "@/lib/api";
-import { LatestReport, StreamUpdate } from "@/types/pact";
+import { LatestReport } from "@/types/pact";
+import { Lock } from "lucide-react";
 
 interface Snapshot {
   elapsed: number;
@@ -70,7 +71,6 @@ export default function DemoPage() {
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Configuration Modes
   const [runMode, setRunMode] = useState<"standard" | "automotive">("standard");
   const [autoReport, setAutoReport] = useState<LatestReport | null>(null);
   const [standardReport, setStandardReport] = useState<LatestReport | null>(null);
@@ -83,7 +83,6 @@ export default function DemoPage() {
   const elapsedIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastSnapshotTimeRef = useRef(0);
 
-  // SSE Stream integration
   const { data, isRunning } = useStream({
     onComplete: async () => {
       setIsComplete(true);
@@ -107,7 +106,6 @@ export default function DemoPage() {
     },
   });
 
-  // Live Terminal Ticker Interval
   useEffect(() => {
     if (isRunning) {
       const interval = setInterval(() => {
@@ -123,14 +121,12 @@ export default function DemoPage() {
     }
   }, [isRunning, runMode]);
 
-  // Terminal scroll to bottom
   useEffect(() => {
     if (logsEndRef.current) {
       logsEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [logs]);
 
-  // Track elapsed time & snapshots during the run
   useEffect(() => {
     if (hasStarted && !isComplete && isRunning) {
       setError(null);
@@ -140,7 +136,6 @@ export default function DemoPage() {
           const currentElapsed = (Date.now() - start) / 1000;
           setElapsed(currentElapsed);
 
-          // Take a telemetry snapshot every 5 seconds
           if (currentElapsed - lastSnapshotTimeRef.current >= 5) {
             lastSnapshotTimeRef.current = currentElapsed;
 
@@ -177,22 +172,20 @@ export default function DemoPage() {
     };
   }, [hasStarted, isComplete, isRunning, data, runMode]);
 
-  // Start Trigger
   const handleStartStressTest = async (mode: "standard" | "automotive") => {
     setRunMode(mode);
     setIsTriggering(true);
     setError(null);
     setElapsed(0);
     setSnapshots([]);
-    setLogs([]); // Clear previous logs
+    setLogs([]);
     lastSnapshotTimeRef.current = 0;
     setIsComplete(false);
-    setHasStarted(true); // Shift view and start timer instantly!
+    setHasStarted(true);
 
-    // Randomize the parameters for each run to achieve highly realistic, unique outcomes
     const randomSeed = Math.floor(Math.random() * 1000) + 1;
-    const standardBuyers = Math.floor(Math.random() * (380 - 250 + 1)) + 250; // 250 to 380 per cat -> 2,500 to 3,800 buyers
-    const enterpriseBuyers = Math.floor(Math.random() * (200 - 120 + 1)) + 120; // 120 to 200 per cat -> 1,200 to 2,000 buyers
+    const standardBuyers = Math.floor(Math.random() * (380 - 250 + 1)) + 250;
+    const enterpriseBuyers = Math.floor(Math.random() * (200 - 120 + 1)) + 120;
 
     try {
       if (mode === "standard") {
@@ -214,13 +207,12 @@ export default function DemoPage() {
       }
     } catch (err: any) {
       setError("Backend offline. Start server by running: py -m uvicorn api.main:app");
-      setHasStarted(false); // Revert view if backend trigger failed
+      setHasStarted(false);
     } finally {
       setIsTriggering(false);
     }
   };
 
-  // Fast Forward / Skip Simulation function
   const handleFastForward = async () => {
     if (elapsedIntervalRef.current) {
       clearInterval(elapsedIntervalRef.current);
@@ -239,7 +231,6 @@ export default function DemoPage() {
     }
   };
 
-  // Derive parameters based on mode
   const total = data?.done || 0;
   const progressPct = data?.pct || 0;
   const throughput = elapsed > 0 ? total / elapsed : 0;
@@ -249,12 +240,11 @@ export default function DemoPage() {
     : (progressPct > 0 ? 25.62 * (progressPct / 100) : 0);
 
   const gmv = runMode === "automotive"
-    ? total * 820000 // Average INR deal size for enterprise services (~₹8.2L)
-    : total * 250000; // Average standard INR services deal size
+    ? total * 820000 
+    : total * 250000;
 
   const cpuTime = elapsed;
 
-  // Category details generator
   const categoryDetails: Record<string, { done: number; success: number; rate: number }> = {};
   if (runMode === "automotive" && autoReport) {
     Object.entries(autoReport.by_category).forEach(([key, cat]) => {
@@ -281,28 +271,28 @@ export default function DemoPage() {
   return (
     <div className="flex flex-col text-[#E5D3B3] min-h-full">
       {/* Header */}
-      <header className="flex justify-between items-center px-8 py-4 border-b border-white/[0.03] bg-[#0C0C0E]/40 backdrop-blur-md select-none">
+      <header className="flex justify-between items-center px-8 py-4 border-b border-[#1E1E1E]/40 bg-[#0D0D0E]/60 backdrop-blur-md select-none">
         <div className="flex items-baseline gap-2">
-          <span className="font-sans font-extrabold text-[15px] uppercase tracking-widest text-[#E5D3B3]">
+          <span className="font-mono text-white text-[15px] font-extralight tracking-[0.5em] uppercase">
             PACT
           </span>
-          <span className="font-sans text-[10px] text-[#8E8675] uppercase tracking-wider">
+          <span className="font-sans text-[8.5px] text-[#807E78] uppercase tracking-widest font-bold">
             Demo Control Center
           </span>
         </div>
 
         {/* Status Pill */}
-        <div className="flex items-center gap-2 px-3 py-1 border border-[#1C1812] rounded-[4px] bg-[#0C0C0C]">
+        <div className="flex items-center gap-2 px-3 py-1 border border-[#1E1E1E] rounded-none bg-[#0D0D0E]">
           <span
-            className={`w-1.5 h-1.5 rounded-full ${
+            className={`w-1.5 h-1.5 ${
               isRunning
                 ? "bg-[#C5A880] animate-pulse"
                 : isComplete
                 ? "bg-[#C5A880]/40"
-                : "bg-[#8E8675]/15"
+                : "bg-[#807E78]/15"
             }`}
           />
-          <span className="font-mono text-[9px] uppercase tracking-wider text-[#8E8675] font-bold">
+          <span className="font-mono text-[8px] uppercase tracking-widest text-[#807E78] font-bold">
             {isRunning
               ? "Running Live"
               : isComplete
@@ -314,39 +304,40 @@ export default function DemoPage() {
 
       {/* Pre-run Selection vs Running/Finished view switcher */}
       {!hasStarted ? (
-        <main className="flex-1 flex flex-col items-center justify-center max-w-4xl mx-auto px-6 py-12 animate-fadeIn">
+        <main className="flex-1 flex flex-col items-center justify-center max-w-4xl mx-auto px-6 py-12 animate-fadeIn select-none">
           
-          <div className="text-center mb-10 select-none">
-            <h1 className="text-xl font-bold tracking-tight text-[#E5D3B3] uppercase font-sans mb-2">
+          <div className="text-center mb-12 select-none">
+            <h1 className="text-lg font-bold tracking-[0.1em] text-[#E5D3B3] uppercase font-sans mb-3">
               B2B Marketplace Sourcing Simulator
             </h1>
-            <p className="text-xs text-[#8E8675] max-w-lg mx-auto font-sans leading-normal uppercase tracking-wider">
+            <p className="text-[9.5px] text-[#807E78] max-w-lg mx-auto font-sans leading-relaxed uppercase tracking-widest font-bold">
               Execute hyper-scale negotiation models powered by the rule-based SAO engine. Benchmark pricing optimization, agent strategies, and sentinel security systems.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mb-10 select-none">
             
             {/* CARD 1: STANDARD SOURCING RUN */}
-            <div className="p-8 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col justify-between hover:border-[#C5A880]/30 transition-all select-none">
+            <div className="p-8 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col justify-between hover:border-[#C5A880]/30 transition-all duration-300 relative group">
+              <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-[#C5A880]/10 group-hover:border-[#C5A880]/30 transition-colors" />
               <div>
-                <span className="text-[9px] font-mono text-[#8E8675] uppercase tracking-wider block mb-1">
-                  Simulator Config 01
+                <span className="text-[8px] font-mono text-[#807E78] uppercase tracking-widest block mb-1 font-bold">
+                  [ Simulator Config 01 ]
                 </span>
-                <h2 className="text-base font-bold text-[#E5D3B3] uppercase tracking-wide font-sans mb-3">
+                <h2 className="text-[13px] font-bold text-[#E5D3B3] uppercase tracking-widest font-sans mb-3">
                   Standard Services Sourcing
                 </h2>
-                <p className="text-[11px] text-[#8E8675] leading-relaxed font-sans mb-6 h-12">
+                <p className="text-[10px] text-[#807E78] leading-relaxed font-sans mb-6 h-12 uppercase tracking-wide font-semibold">
                   Execute the default marketplace stress test with professional B2B services. Monitors live data exchange via Server-Sent Events (SSE).
                 </p>
                 
-                <div className="grid grid-cols-2 gap-4 border-t border-[#1C1812] pt-4 mb-8 font-mono text-[11px] text-[#E5D3B3] tabular-nums">
+                <div className="grid grid-cols-2 gap-4 border-t border-[#1E1E1E] pt-5 mb-8 font-mono text-[10px] text-[#E5D3B3] tabular-nums">
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-[#4A4339] font-sans font-bold">Buyers Pool</div>
+                    <div className="text-[8px] uppercase tracking-widest text-[#48484A] font-sans font-bold">Buyers Pool</div>
                     <div className="font-bold mt-0.5">Randomized (2.5K - 3.8K)</div>
                   </div>
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-[#4A4339] font-sans font-bold">Sellers Pool</div>
+                    <div className="text-[8px] uppercase tracking-widest text-[#48484A] font-sans font-bold">Sellers Pool</div>
                     <div className="font-bold mt-0.5">1,000 total</div>
                   </div>
                 </div>
@@ -355,32 +346,33 @@ export default function DemoPage() {
               <button
                 onClick={() => handleStartStressTest("standard")}
                 disabled={isTriggering}
-                className="w-full py-3.5 text-center text-xs font-bold uppercase tracking-widest text-[#C5A880] bg-[#060606] border border-[#1C1812] rounded-[4px] transition-all hover:bg-[#1C1812]/20 hover:border-[#C5A880] active:scale-[0.98] disabled:border-[#1C1812] disabled:text-[#4A4339] disabled:cursor-not-allowed cursor-pointer"
+                className="w-full py-4 text-center text-[9px] font-mono font-bold uppercase tracking-widest text-[#C5A880] bg-[#070708] border border-[#1E1E1E] rounded-none transition-all hover:bg-[#1E1E1E]/20 hover:border-[#C5A880] active:scale-[0.98] disabled:border-[#1E1E1E] disabled:text-[#48484A] disabled:cursor-not-allowed cursor-pointer"
               >
                 {isTriggering && runMode === "standard" ? "Initializing..." : "Run Standard Model"}
               </button>
             </div>
 
             {/* CARD 2: ENTERPRISE SERVICES RUN */}
-            <div className="p-8 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col justify-between hover:border-[#C5A880]/30 transition-all select-none">
+            <div className="p-8 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col justify-between hover:border-[#C5A880]/30 transition-all duration-300 relative group">
+              <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-[#C5A880]/10 group-hover:border-[#C5A880]/30 transition-colors" />
               <div>
-                <span className="text-[9px] font-mono text-[#8E8675] uppercase tracking-wider block mb-1">
-                  Simulator Config 02
+                <span className="text-[8px] font-mono text-[#807E78] uppercase tracking-widest block mb-1 font-bold">
+                  [ Simulator Config 02 ]
                 </span>
-                <h2 className="text-base font-bold text-[#E5D3B3] uppercase tracking-wide font-sans mb-3">
+                <h2 className="text-[13px] font-bold text-[#E5D3B3] uppercase tracking-widest font-sans mb-3">
                   Enterprise IT & BPO Outsourcing
                 </h2>
-                <p className="text-[11px] text-[#8E8675] leading-relaxed font-sans mb-6 h-12">
+                <p className="text-[10px] text-[#807E78] leading-relaxed font-sans mb-6 h-12 uppercase tracking-wide font-semibold">
                   Execute the ultra-high load enterprise BPO & IT infrastructure services stress test. Measures pricing constraints, service level parameters, and platform savings yield.
                 </p>
 
-                <div className="grid grid-cols-2 gap-4 border-t border-[#1C1812] pt-4 mb-8 font-mono text-[11px] text-[#E5D3B3] tabular-nums">
+                <div className="grid grid-cols-2 gap-4 border-t border-[#1E1E1E] pt-5 mb-8 font-mono text-[10px] text-[#E5D3B3] tabular-nums">
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-[#4A4339] font-sans font-bold">Negotiations Pool</div>
+                    <div className="text-[8px] uppercase tracking-widest text-[#48484A] font-sans font-bold">Negotiations Pool</div>
                     <div className="font-bold mt-0.5">Randomized (1.2K - 2.0K)</div>
                   </div>
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-[#4A4339] font-sans font-bold">Sellers Pool</div>
+                    <div className="text-[8px] uppercase tracking-widest text-[#48484A] font-sans font-bold">Sellers Pool</div>
                     <div className="font-bold mt-0.5">1,000 total</div>
                   </div>
                 </div>
@@ -389,7 +381,7 @@ export default function DemoPage() {
               <button
                 onClick={() => handleStartStressTest("automotive")}
                 disabled={isTriggering}
-                className="w-full py-3.5 text-center text-xs font-bold uppercase tracking-widest text-[#060606] bg-[#C5A880] border border-[#C5A880] rounded-[4px] transition-all hover:bg-[#E5D3B3] hover:border-[#E5D3B3] active:scale-[0.98] disabled:bg-[#1C1812] disabled:border-[#1C1812] disabled:text-[#4A4339] disabled:cursor-not-allowed cursor-pointer"
+                className="w-full py-4 text-center text-[9px] font-mono font-bold uppercase tracking-widest text-[#070708] bg-[#C5A880] border border-[#C5A880] rounded-none transition-all hover:bg-[#E5D3B3] hover:border-[#E5D3B3] active:scale-[0.98] disabled:bg-[#1E1E1E] disabled:border-[#1E1E1E] disabled:text-[#48484A] disabled:cursor-not-allowed cursor-pointer"
               >
                 {isTriggering && runMode === "automotive" ? "Loading Data..." : "Run Enterprise Services Model"}
               </button>
@@ -397,33 +389,32 @@ export default function DemoPage() {
 
           </div>
 
-          <p className="text-[10px] font-mono text-[#4A4339] text-center select-none uppercase tracking-widest font-bold">
+          <p className="text-[8px] font-mono text-[#48484A] text-center select-none uppercase tracking-widest font-bold">
             Global IT & Business Services Sector · Pure Rule-Based SAO Logic · 8-factor Sentinel Protection
           </p>
 
-          {/* Inline Error */}
           {error && (
-            <div className="mt-6 w-full p-4 border border-[#C5A880]/30 bg-[#060606] rounded-[6px] text-center font-mono text-[11px] text-[#C5A880] uppercase tracking-wider">
+            <div className="mt-6 w-full p-4 border border-red-500/20 bg-[#0D0D0E] rounded-none text-center font-mono text-[9px] text-red-400 uppercase tracking-widest">
               {error}
             </div>
           )}
         </main>
       ) : (
-        <main className="flex-1 flex flex-col gap-6 max-w-7xl w-full mx-auto px-8 py-8 animate-fadeIn">
+        <main className="flex-1 flex flex-col gap-6 max-w-7xl w-full mx-auto px-8 py-8 animate-fadeIn select-none">
           
           {/* Simulation status / Skip banner */}
           {!isComplete && (
-            <div className="flex justify-between items-center px-4 py-2 border border-[#1C1812] rounded-[4px] bg-[#0C0C0C] select-none">
-              <span className="font-mono text-[10px] text-[#8E8675] uppercase tracking-wider">
+            <div className="flex justify-between items-center px-5 py-2.5 border border-[#1E1E1E] rounded-none bg-[#0D0D0E] select-none">
+              <span className="font-mono text-[9px] text-[#807E78] uppercase tracking-widest font-bold">
                 {runMode === "automotive" 
                   ? "Simulating enterprise BPO & IT services: corporate clients..."
                   : "Simulating standard B2B services: buyers..."}
               </span>
               <button 
                 onClick={handleFastForward}
-                className="font-mono text-[10px] text-[#C5A880] uppercase tracking-wider hover:text-[#E5D3B3] border border-[#1C1812] px-3 py-1 rounded-[3px] bg-[#060606] active:scale-95 transition-all cursor-pointer hover:border-[#C5A880]"
+                className="font-mono text-[9px] text-[#C5A880] uppercase tracking-widest hover:text-[#E5D3B3] border border-[#1E1E1E] px-3.5 py-1.5 rounded-none bg-[#070708] active:scale-95 transition-all cursor-pointer hover:border-[#C5A880]"
               >
-                ⏩ Fast Forward / Skip
+                [SKIP] Fast Forward
               </button>
             </div>
           )}
@@ -446,15 +437,15 @@ export default function DemoPage() {
             cpuTime={cpuTime}
           />
 
-          {/* If simulation completed, show the beautiful premium report details! */}
+          {/* Sourcing Report */}
           {isComplete ? (
-            <div className="flex flex-col gap-6 border-t border-[#1C1812] pt-8 mt-4">
+            <div className="flex flex-col gap-6 border-t border-[#1E1E1E] pt-8 mt-4">
               <div className="flex flex-col select-none mb-2">
-                <span className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675]">
+                <span className="text-[9px] font-sans font-bold uppercase tracking-[0.18em] text-[#807E78]">
                   POST-RUN AUDIT REPORT
                 </span>
-                <h3 className="font-sans font-bold text-lg text-[#E5D3B3] uppercase tracking-wider mt-0.5">
-                  {runMode === "automotive" ? "💼 Enterprise Outsourced Services Negotiation Report" : "📦 Standard B2B Services Sourcing Report"}
+                <h3 className="font-sans font-bold text-[15px] text-[#E5D3B3] uppercase tracking-widest mt-1">
+                  {runMode === "automotive" ? "Enterprise Outsourced Services Negotiation Report" : "Standard B2B Services Sourcing Report"}
                 </h3>
               </div>
 
@@ -467,8 +458,8 @@ export default function DemoPage() {
               )}
 
               {runMode === "standard" && !standardReport && (
-                <div className="p-12 text-center border border-[#1C1812] rounded-[6px] bg-[#0C0C0C]">
-                  <span className="font-mono text-xs text-[#8E8675]">Loading final standard report ledger...</span>
+                <div className="p-12 text-center border border-[#1E1E1E] rounded-none bg-[#0D0D0E]">
+                  <span className="font-mono text-xs text-[#807E78] tracking-widest uppercase animate-pulse">Loading final standard report ledger...</span>
                 </div>
               )}
             </div>
@@ -481,21 +472,22 @@ export default function DemoPage() {
                   categoryDetails={categoryDetails} 
                 />
 
-                {/* Live Negotiation Ticker Card */}
-                <div className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.4)] flex flex-col h-[280px]">
-                  <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] mb-3 border-b border-[#1C1812] pb-2 flex justify-between items-baseline select-none">
+                {/* Live Sourcing Ticker Card */}
+                <div className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none flex flex-col h-[280px] relative group">
+                  <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-[#C5A880]/15" />
+                  <div className="text-[9px] font-sans font-bold uppercase tracking-[0.15em] text-[#807E78] mb-3.5 border-b border-[#1E1E1E]/50 pb-2.5 flex justify-between items-baseline select-none">
                     <span>Live Negotiation Ticker (Sentinel Monitored Stream)</span>
-                    <span className="font-mono text-[9px] text-[#4A4339]">pure rule-based sao logic</span>
+                    <span className="font-mono text-[8px] text-[#48484A] font-bold">[ PURE RULE-BASED SAO LOGIC ]</span>
                   </div>
-                  <div className="flex-1 font-mono text-[10px] text-[#8E8675] overflow-y-auto leading-relaxed select-text flex flex-col gap-1 pr-1 custom-scrollbar">
+                  <div className="flex-1 font-mono text-[9.5px] text-[#807E78] overflow-y-auto leading-relaxed select-text flex flex-col gap-1.5 pr-1 custom-scrollbar">
                     {logs.length === 0 ? (
-                      <div className="text-[#4A4339] italic animate-pulse h-full flex items-center justify-center">
-                        ⚡ WARMING UP SENTINEL DEEP-PACKET STREAM LEDGER...
+                      <div className="text-[#48484A] italic animate-pulse h-full flex items-center justify-center tracking-widest uppercase">
+                        WARMING UP SENTINEL DEEP-PACKET STREAM LEDGER...
                       </div>
                     ) : (
                       logs.map((log, index) => (
                         <div key={index} className="flex gap-2">
-                          <span className="text-[#4A4339] select-none">[LOG]</span>
+                          <span className="text-[#48484A] select-none font-bold">[LOG]</span>
                           <span>{log}</span>
                         </div>
                       ))
@@ -513,8 +505,8 @@ export default function DemoPage() {
       )}
 
       {/* Footer */}
-      <footer className="py-4 border-t border-white/[0.03] bg-[#0C0C0E]/20 backdrop-blur-md text-center select-none font-sans mt-auto">
-        <span className="font-mono text-[10px] text-[#4A4339] tracking-wider uppercase font-semibold">
+      <footer className="py-4 border-t border-[#1E1E1E]/40 bg-[#0D0D0E]/20 backdrop-blur-md text-center select-none mt-auto">
+        <span className="font-mono text-[8.5px] text-[#48484A] tracking-widest uppercase font-bold">
           Pure SAO engine · Zero LLM tokens per round · Single CPU thread · 1.9B negs/day theoretical
         </span>
       </footer>

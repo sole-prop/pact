@@ -6,7 +6,6 @@ import { formatNumber } from "@/lib/format";
 
 interface CategoryGridProps {
   data: StreamUpdate | null;
-  // If we have detailed categorised live stats from parent
   categoryDetails?: Record<string, { done: number; success: number; rate: number }>;
 }
 
@@ -39,20 +38,17 @@ const ENTERPRISE_CATEGORIES = [
 export function CategoryGrid({ data, categoryDetails }: CategoryGridProps) {
   const isEnterprise = categoryDetails && Object.keys(categoryDetails).some(k => k === "custom_software" || k === "it_infrastructure");
   const categoriesList = isEnterprise ? ENTERPRISE_CATEGORIES : STANDARD_CATEGORIES;
-  // If data or detailed data isn't loaded yet, show skeletons
   const isLoading = !data;
 
-  // Formatting helpers
   const getBarColor = (rate: number) => {
-    if (rate >= 90) return "bg-[#C5A880]"; // Primary Gold
-    if (rate >= 60) return "bg-[#E5D3B3]"; // Champagne White
-    return "bg-[#8E8675]"; // Muted Sand
+    if (rate >= 90) return "bg-[#C5A880]";
+    if (rate >= 60) return "bg-[#E5D3B3]";
+    return "bg-[#807E78]";
   };
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 select-none">
       {categoriesList.map((cat) => {
-        // Fallback calculation during real-time streaming
         const details = categoryDetails?.[cat.key];
         const dealsClosed = details ? details.done : 0;
         const successRate = details ? details.rate : 0;
@@ -61,11 +57,11 @@ export function CategoryGrid({ data, categoryDetails }: CategoryGridProps) {
           return (
             <div
               key={cat.key}
-              className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] h-[130px] flex flex-col justify-between animate-pulse"
+              className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none h-[130px] flex flex-col justify-between animate-pulse"
             >
-              <div className="h-2.5 bg-[#1C1812] w-2/3 rounded-[2px]" />
-              <div className="h-6 bg-[#1C1812] w-1/3 rounded-[2px]" />
-              <div className="h-[3px] bg-[#1C1812] w-full rounded-[2px]" />
+              <div className="h-2.5 bg-[#1E1E1E] w-2/3" />
+              <div className="h-6 bg-[#1E1E1E] w-1/3" />
+              <div className="h-[3px] bg-[#1E1E1E] w-full" />
             </div>
           );
         }
@@ -73,27 +69,30 @@ export function CategoryGrid({ data, categoryDetails }: CategoryGridProps) {
         return (
           <div
             key={cat.key}
-            className="p-6 bg-[#0C0C0C] border border-[#1C1812] rounded-[6px] h-[130px] flex flex-col justify-between shadow-[0_1px_3px_rgba(0,0,0,0.4)] hover:border-[#C5A880]/30 transition-all duration-150"
+            className="p-6 bg-[#0D0D0E] border border-[#1E1E1E] rounded-none h-[130px] flex flex-col justify-between hover:border-[#C5A880]/30 transition-all duration-300 relative group"
           >
+            {/* Fine ticks */}
+            <div className="absolute top-1 left-1 w-1 h-1 border-t border-l border-[#C5A880]/10 group-hover:border-[#C5A880]/30 transition-colors" />
+            
             {/* Category Name */}
-            <div className="text-[10px] font-sans font-bold uppercase tracking-[0.08em] text-[#8E8675] truncate">
+            <div className="text-[9px] font-sans font-bold uppercase tracking-[0.12em] text-[#807E78] truncate">
               {cat.label}
             </div>
 
             {/* Main Deals Stats */}
-            <div className="my-2 flex items-baseline justify-between">
-              <span className="font-mono text-2.5xl font-bold text-[#E5D3B3] tabular-nums" suppressHydrationWarning>
+            <div className="my-2 flex items-baseline justify-between select-none">
+              <span className="font-mono text-2xl font-light text-[#E5D3B3] tabular-nums" suppressHydrationWarning>
                 {formatNumber(dealsClosed)}
               </span>
-              <span className="font-mono text-[9px] uppercase tracking-wider text-[#C5A880] font-bold tabular-nums ml-2">
+              <span className="font-mono text-[8.5px] uppercase tracking-widest text-[#C5A880] font-bold tabular-nums ml-2">
                 {successRate.toFixed(1)}% ok
               </span>
             </div>
 
-            {/* Micro Progress Bar */}
-            <div className="w-full h-[3px] bg-[#1C1812] rounded-[2px] overflow-hidden">
+            {/* Flat Progress Bar */}
+            <div className="w-full h-[3px] bg-[#070708] border border-[#1E1E1E] rounded-none overflow-hidden p-[0.5px]">
               <div
-                className={`h-full rounded-[2px] transition-all duration-300 ease-out ${getBarColor(
+                className={`h-full rounded-none transition-all duration-300 ease-out ${getBarColor(
                   successRate
                 )}`}
                 style={{ width: `${successRate}%` }}
