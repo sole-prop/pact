@@ -1,4 +1,14 @@
 """
+================================================================================
+PACT PUBLIC DEMO ENGINE — SECURE ARCHITECTURAL STUB
+================================================================================
+This file constitutes an open-source demonstration stub of the Stacked Alternating 
+Offers (SAO) negotiation protocol, optimized strictly for simulation runtime 
+telemetry and public validation. Proprietary core enterprise execution formulas, 
+production MCDA weights, and multi-criteria coordination curves are redacted 
+and isolated to protect proprietary enterprise IP.
+================================================================================
+
 SAO (Stacked Alternating Offers) negotiation protocol — v3 for Indian MSME market.
 
 Key upgrades over v2:

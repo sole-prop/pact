@@ -1,26 +1,37 @@
-import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
-import "./globals.css";
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700', '800'],
+})
 
 export const metadata: Metadata = {
-  title: "PACT — Autonomous B2B Negotiation",
-  description: "Autonomous B2B negotiation marketplace dashboard. Processing thousands of negotiations per second.",
-};
+  title: 'PACT — Commercial OS',
+  description: 'Negotiation, Autonomized.',
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html
-      lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-[var(--background-base)] text-[var(--text-primary)]">
+    <html lang="en" className={inter.variable}>
+      <body
+        className={inter.className}
+        style={{
+          backgroundColor: '#0D1426',
+          color: '#F1F5F9',
+          margin: 0,
+          padding: 0,
+        }}
+      >
         {children}
       </body>
     </html>
-  );
+  )
 }

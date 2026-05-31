@@ -18,9 +18,9 @@ PACT is a proprietary, high-performance autonomous Agent-to-Agent (A2A) B2B nego
 
 This repository contains the **FastAPI Backend Services** and the high-fidelity **Next.js Frontend Dashboard** designed with the visual gravity of institutional trading terminals.
 
-> [!IMPORTANT]
-> **PROPRIETARY AND CONFIDENTIAL**  
-> All source code, logic, and architectural designs contained within this repository are the sole intellectual property of B2B Negotiation Marketplace. Unauthorized copying, distribution, or execution of this software is strictly prohibited.
+> [!NOTE]
+> **OPEN SOURCE PUBLIC RELEASE (Apache-2.0)**  
+> PACT's core negotiation protocol routing, multi-criteria evaluation engines, and high-fidelity dashboard structures are fully open-sourced for the B2B tech community. Run the local mock workspace node to test game-theoretic integrations instantly!
 
 ---
 

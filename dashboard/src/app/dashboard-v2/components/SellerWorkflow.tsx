@@ -1,5 +1,8 @@
-import React from "react";
-import { Search, Sliders } from "lucide-react";
+"use client";
+
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Sliders, ArrowUpRight, Check, Activity, Target, Shield, Clock, Compass, Sparkles, Plus, Award } from "lucide-react";
 import { LatestReport } from "@/types/pact";
 
 interface SellerWorkflowProps {
@@ -7,212 +10,547 @@ interface SellerWorkflowProps {
 }
 
 export function SellerWorkflow({ report }: SellerWorkflowProps) {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [selectedStrategy, setSelectedStrategy] = React.useState<string>("all");
+  // Concession parameters
+  const [markupMultiplier, setMarkupMultiplier] = useState(1.02);
+  const [concessionPace, setConcessionPace] = useState(12);
 
-  // Global Config Stub States
-  const [markupMultiplier, setMarkupMultiplier] = React.useState(1.0);
-  const [moqLeniency, setMoqLeniency] = React.useState(10); // in percent
-  const [isConfigSaving, setIsConfigSaving] = React.useState(false);
-  const [configSuccess, setConfigSuccess] = React.useState(false);
+  // Core view state
+  const [sellerView, setSellerView] = useState<"overview" | "negotiate" | "detail" | "add-service">("overview");
+  const [selectedOpportunity, setSelectedOpportunity] = useState<any>(null);
+  const [chosenStrategy, setChosenStrategy] = useState("realistic");
 
-  const leaderboard = report?.agent_leaderboard || [];
+  // Listing creation form state
+  const [newServiceName, setNewServiceName] = useState("Scale Design Node");
+  const [newServiceCategory, setNewServiceCategory] = useState("Design & Branding");
+  const [newServiceRate, setNewServiceRate] = useState(125000);
+  const [newServiceDuration, setNewServiceDuration] = useState("4 Weeks");
 
-  const strategies = [
-    { value: "all", label: "All Strategies" },
-    { value: "realistic", label: "Realistic Balance" },
-    { value: "conceder", label: "Conceder Swarm" },
-    { value: "boulware", label: "Boulware Rigid" },
-    { value: "hardball", label: "Hardball Escalator" },
-    { value: "tit_for_tat", label: "Tit-For-Tat" },
+  // Local state for listings
+  const [myListings, setMyListings] = useState([
+    { id: "LST-001", name: "Premium SaaS Consulting", category: "SaaS Consulting", rate: 85000, duration: "6 Weeks" },
+    { id: "LST-002", name: "Next.js Core Architecture", category: "AI Development", rate: 140000, duration: "8 Weeks" }
+  ]);
+
+  // Recommended opportunities
+  const [opportunities, setOpportunities] = useState([
+    {
+      id: "OPP-3904",
+      buyer: "Vercel Partner Node",
+      category: "AI Development",
+      duration: "4 Weeks",
+      targetPrice: 110000,
+      confidence: "98.4%",
+      urgency: "critical",
+    },
+    {
+      id: "OPP-1102",
+      buyer: "Supabase Corp Services",
+      category: "SaaS Consulting",
+      duration: "8 Weeks",
+      targetPrice: 75000,
+      confidence: "92.1%",
+      urgency: "high",
+    },
+    {
+      id: "OPP-0822",
+      buyer: "Framer Labs Node",
+      category: "Design & Branding",
+      duration: "6 Weeks",
+      targetPrice: 42000,
+      confidence: "87.5%",
+      urgency: "medium",
+    },
+  ]);
+
+  // Active negotiations
+  const activeNegotiations = [
+    {
+      id: "NEG-9840",
+      buyer: "Linear App OS",
+      category: "Cloud Engineering",
+      duration: "12 Weeks",
+      currentOffer: 88500,
+      buyerBid: 82000,
+      convergence: "89.2%",
+      strategy: "Tit-For-Tat",
+    },
+    {
+      id: "NEG-1830",
+      buyer: "Attio CRM Services",
+      category: "HR Advisory",
+      duration: "4 Weeks",
+      currentOffer: 15400,
+      buyerBid: 14200,
+      convergence: "78.4%",
+      strategy: "Realistic Balance",
+    },
   ];
 
-  const defaultSellers = [
-    { seller_id: "S-001", name: "Tata Steel Agents", strategy: "boulware", category: "Metals", success_pct: 77.1 },
-    { seller_id: "S-002", name: "Reliance Chem Bot", strategy: "realistic", category: "Chemicals", success_pct: 84.8 },
-    { seller_id: "S-003", name: "Infosys Hardware Core", strategy: "conceder", category: "Electronics", success_pct: 94.6 },
-    { seller_id: "S-004", name: "Adani Logistics Swarm", strategy: "tit_for_tat", category: "Logistics", success_pct: 79.9 },
+  // Signed contracts
+  const signedAgreements = [
+    {
+      id: "AGR-1002",
+      buyer: "Stripe Payment Node",
+      category: "Legal Advisory",
+      duration: "2 Weeks",
+      settledPrice: 12400,
+      date: "2026-05-31",
+    },
   ];
 
-  const displaySellers = leaderboard.length > 0 ? leaderboard : defaultSellers;
+  const categories = [
+    "AI Development",
+    "Design & Branding",
+    "SaaS Consulting",
+    "Cloud Engineering",
+    "Content Marketing",
+    "Financial Audit",
+    "HR Advisory",
+    "Legal Advisory"
+  ];
 
-  const filteredSellers = displaySellers.filter((s) => {
-    const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStrategy = selectedStrategy === "all" || s.strategy.toLowerCase() === selectedStrategy.toLowerCase();
-    return matchesSearch && matchesStrategy;
-  });
-
-  const handleSaveConfig = (e: React.FormEvent) => {
+  const handleCreateListing = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsConfigSaving(true);
-    setConfigSuccess(false);
+    const newId = "LST-" + Math.floor(Math.random() * 900 + 100);
+    const newService = {
+      id: newId,
+      name: newServiceName,
+      category: newServiceCategory,
+      rate: newServiceRate,
+      duration: newServiceDuration
+    };
 
-    setTimeout(() => {
-      setIsConfigSaving(false);
-      setConfigSuccess(true);
-      setTimeout(() => setConfigSuccess(false), 3000);
-    }, 1200);
+    setMyListings([newService, ...myListings]);
+
+    // Intelligently auto-generate a matching buyer opportunity based on listed service to demonstrate autonomous matching
+    const newOpp = {
+      id: "OPP-" + Math.floor(Math.random() * 9000 + 1000),
+      buyer: "Mercury Capital Node",
+      category: newServiceCategory,
+      duration: newServiceDuration,
+      targetPrice: newServiceRate * 0.92,
+      confidence: "99.1%",
+      urgency: "critical"
+    };
+    setOpportunities([newOpp, ...opportunities]);
+
+    setSellerView("overview");
   };
 
-  const getStrategyBadge = (strat: string) => {
-    const styleMap: Record<string, string> = {
-      realistic: "text-cyan-400 bg-cyan-950/20 border-cyan-800/10",
-      conceder: "text-emerald-400 bg-emerald-950/20 border-emerald-800/10",
-      boulware: "text-rose-400 bg-rose-950/20 border-rose-800/10",
-      hardball: "text-amber-400 bg-amber-950/20 border-amber-800/10",
-      tit_for_tat: "text-purple-400 bg-purple-950/20 border-purple-800/10",
-    };
-    return (
-      <span className={`px-2.5 py-0.5 border font-sans text-[10px] font-semibold rounded-full ${styleMap[strat.toLowerCase()] || "text-[#8E8E93] bg-[#070708]"}`}>
-        {strat.replace("_", " ")}
-      </span>
-    );
+  const handleLaunchOpportunity = (opp: any) => {
+    setSelectedOpportunity(opp);
+    setSellerView("detail");
   };
 
   return (
-    <div className="space-y-10 w-full max-w-[1100px] mx-auto select-none text-left pt-2">
-      {/* Title */}
-      <div className="space-y-2">
-        <h2 className="font-sans text-3xl font-extrabold text-[#F2F2F7] tracking-tight">Sellers Directory</h2>
-        <p className="font-sans text-sm text-[#8E8E93] max-w-xl">
-          Direct active swarms and adjust global bidding parameters in real-time.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
-        {/* Column 1 & 2: Directory */}
-        <div className="lg:col-span-2 space-y-6">
-          
-          {/* Filters */}
-          <div className="bg-[#111112]/40 backdrop-blur-md border border-white/[0.04] p-4 flex flex-col sm:flex-row gap-3 items-center justify-between" style={{ borderRadius: "12px" }}>
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3.5 top-2.5 h-3.5 w-3.5 text-[#8E8E93]/40" />
-              <input
-                type="text"
-                placeholder="Search sellers..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-8 pl-10 pr-3 bg-[#070708]/60 border border-white/[0.04] font-sans text-xs text-[#F2F2F7] focus:outline-none focus:border-[#C5A880] placeholder-[#8E8E93]/35 rounded-lg"
-              />
-            </div>
-
-            <select
-              value={selectedStrategy}
-              onChange={(e) => setSelectedStrategy(e.target.value)}
-              className="w-full sm:w-auto h-8 px-2 bg-[#070708]/60 border border-white/[0.04] font-sans text-xs text-[#F2F2F7] focus:outline-none focus:border-[#C5A880] cursor-pointer rounded-lg"
-            >
-              {strategies.map((strat) => (
-                <option key={strat.value} value={strat.value} className="bg-[#111112]">
-                  {strat.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* List display */}
-          <div className="bg-[#111112]/40 backdrop-blur-md border border-white/[0.04] p-6 space-y-6 shadow-sm" style={{ borderRadius: "12px" }}>
-            <span className="font-sans text-xs font-semibold text-[#8E8E93]/80 block border-b border-white/[0.04] pb-3">
-              Active Agents Registry
-            </span>
-
-            <div className="space-y-4 pt-1">
-              {filteredSellers.length > 0 ? (
-                filteredSellers.map((seller) => (
-                  <div key={seller.seller_id} className="flex items-center justify-between p-3 hover:bg-white/[0.015] rounded-xl transition-colors">
-                    <div className="space-y-1">
-                      <span className="font-sans text-sm font-bold text-[#F2F2F7] block">
-                        {seller.name}
-                      </span>
-                      <span className="font-sans text-xs text-[#8E8E93] block">
-                        Category: {seller.category} • ID: {seller.seller_id}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      {getStrategyBadge(seller.strategy)}
-                      <span className="font-mono text-xs font-bold text-emerald-400 tabular-nums">
-                        {seller.success_pct.toFixed(0)}% Win
-                      </span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center font-sans text-xs text-[#8E8E93]/30 py-12">
-                  No active seller agents found matches
-                </div>
-              )}
-            </div>
-          </div>
+    <div className="space-y-12 w-full max-w-[1200px] mx-auto select-none text-left pt-2 pb-24 relative z-10 font-sans">
+      
+      {/* Title Header */}
+      <div className="flex justify-between items-end border-b border-[#c4c7c7]/30 pb-6">
+        <div>
+          <span className="label-caps text-[#444748] block">FLEET CONTROL</span>
+          <h2 className="section-header text-[#0d0d0d] mt-2 font-sans">Seller Workspace</h2>
         </div>
 
-        {/* Column 3: Slider overrides */}
-        <div className="space-y-6">
-          <div className="bg-[#111112]/40 backdrop-blur-md border border-white/[0.04] p-6 space-y-6 shadow-sm" style={{ borderRadius: "12px" }}>
-            <div className="flex items-center gap-2 border-b border-white/[0.04] pb-3">
-              <Sliders className="h-4 w-4 text-[#C5A880]" />
-              <span className="font-sans text-xs font-semibold text-[#F2F2F7]">
-                Core Configuration
-              </span>
+        {sellerView !== "overview" && (
+          <button 
+            onClick={() => setSellerView("overview")}
+            className="px-4 py-2 border border-[#c4c7c7] hover:border-[#4b41e1] text-[#0d0d0d] text-[10px] tracking-wider uppercase font-bold rounded-[0.5rem] transition-colors cursor-pointer"
+          >
+            ← Back to Fleet Summary
+          </button>
+        )}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {sellerView === "overview" && (
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start"
+          >
+            
+            {/* Left 8 Columns */}
+            <div className="lg:col-span-8 space-y-12">
+              
+              {/* SECTION: MY LISTED SERVICES */}
+              <div className="bg-[#ffffff] border border-[#c4c7c7]/30 p-8 rounded-[0.5rem] space-y-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                <div className="flex justify-between items-center border-b border-[#c4c7c7]/20 pb-4">
+                  <div className="flex items-center gap-2">
+                    <Award className="h-4.5 w-4.5 text-[#4b41e1]" />
+                    <span className="label-caps text-[#0d0d0d]">My Listed Services Node</span>
+                  </div>
+                  <button 
+                    onClick={() => setSellerView("add-service")}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-[#0d0d0d] hover:bg-[#232323] text-white text-[9px] tracking-wider uppercase font-extrabold rounded-[0.5rem] transition-all duration-300 cursor-pointer"
+                  >
+                    <Plus className="h-3 w-3" /> List Service
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {myListings.map((lst) => (
+                    <motion.div 
+                      key={lst.id}
+                      whileHover={{ scale: 1.01 }}
+                      className="p-5 bg-[#fdf8f8] border border-[#c4c7c7]/30 rounded-[0.5rem] text-left flex flex-col justify-between min-h-[140px] transition-all duration-300"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <span className="label-caps text-[#444748] block">{lst.category}</span>
+                          <h4 className="text-[13px] font-bold text-[#0d0d0d] tracking-tight mt-1">{lst.name}</h4>
+                        </div>
+                        <span className="font-mono text-[9px] text-[#444748]">{lst.id}</span>
+                      </div>
+
+                      <div className="flex justify-between items-end border-t border-[#c4c7c7]/20 pt-4 mt-4">
+                        <div>
+                          <span className="block text-[8px] uppercase tracking-wider text-[#444748]">Contract Rate</span>
+                          <span className="text-[14px] font-bold font-mono text-[#4b41e1]">${lst.rate.toLocaleString()}</span>
+                        </div>
+                        <span className="text-[9px] font-semibold text-[#444748] uppercase">{lst.duration}</span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* RECOMMENDED OPPORTUNITIES */}
+              <div className="bg-[#ffffff] border border-[#c4c7c7]/30 p-8 rounded-[0.5rem] space-y-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                <div className="flex items-center gap-2 border-b border-[#c4c7c7]/20 pb-4">
+                  <Target className="h-4.5 w-4.5 text-[#4b41e1]" />
+                  <span className="label-caps text-[#0d0d0d]">Matching Buyer RFP Opportunities</span>
+                </div>
+
+                <div className="space-y-4">
+                  {opportunities.map((opp) => (
+                    <motion.div 
+                      key={opp.id}
+                      whileHover={{ x: 4 }}
+                      onClick={() => handleLaunchOpportunity(opp)}
+                      className="flex items-center justify-between p-4 hover:bg-[#fdf8f8] border border-transparent hover:border-[#c4c7c7]/30 rounded-sm transition-all duration-300 cursor-pointer"
+                    >
+                      <div className="space-y-1 text-left">
+                        <span className="text-[13px] font-bold text-[#0d0d0d] block">{opp.buyer}</span>
+                        <span className="text-[11px] text-[#444748] block font-sans">
+                          Service Needed: {opp.category} • Target Budget: ${opp.targetPrice.toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-6">
+                        <div className="text-right">
+                          <span className="block text-[8px] uppercase tracking-wider text-[#444748]">Matching Score</span>
+                          <span className="text-[12px] font-mono font-bold text-[#4b41e1]">{opp.confidence}</span>
+                        </div>
+                        <ArrowUpRight className="h-4 w-4 text-[#444748]" />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ACTIVE NEGOTIATIONS */}
+              <div className="bg-[#ffffff] border border-[#c4c7c7]/30 p-8 rounded-[0.5rem] space-y-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                <div className="flex items-center gap-2 border-b border-[#c4c7c7]/20 pb-4">
+                  <Activity className="h-4.5 w-4.5 text-[#4b41e1]" />
+                  <span className="label-caps text-[#0d0d0d]">Active Bidding Loops</span>
+                </div>
+
+                <div className="space-y-4">
+                  {activeNegotiations.map((neg) => (
+                    <motion.div 
+                      key={neg.id}
+                      whileHover={{ x: 4 }}
+                      onClick={() => {
+                        setSelectedOpportunity(neg);
+                        setSellerView("negotiate");
+                      }}
+                      className="flex items-center justify-between p-4 hover:bg-[#fdf8f8] border border-transparent hover:border-[#c4c7c7]/30 rounded-sm transition-all duration-300 cursor-pointer"
+                    >
+                      <div className="space-y-1 text-left">
+                        <span className="text-[13px] font-bold text-[#0d0d0d] block">{neg.buyer}</span>
+                        <span className="text-[11px] text-[#444748] block">
+                          Duration: {neg.duration} • Method: {neg.strategy}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-6">
+                        <div className="text-right">
+                          <span className="block text-[8px] uppercase tracking-wider text-[#444748]">Convergence Vector</span>
+                          <span className="text-[12px] font-mono font-bold text-emerald-600">{neg.convergence}</span>
+                        </div>
+                        <ArrowUpRight className="h-4 w-4 text-[#444748]" />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
             </div>
 
-            <p className="font-sans text-xs text-[#8E8E93] leading-relaxed text-left">
-              Inject instruction sets into all swarms globally in real-time.
-            </p>
-
-            <form onSubmit={handleSaveConfig} className="space-y-5 pt-2">
-              <div className="space-y-2 text-left">
-                <div className="flex items-center justify-between font-sans text-xs font-medium text-[#8E8E93]">
-                  <span>Starting markup</span>
-                  <span className="text-[#C5A880] font-bold font-mono tabular-nums">
-                    {markupMultiplier >= 1.0 ? "+" : ""}{(markupMultiplier - 1.0).toFixed(1)}%
-                  </span>
+            {/* Right 4 Columns */}
+            <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-8">
+              <div className="bg-[#ffffff] border border-[#c4c7c7]/30 p-8 rounded-[0.5rem] space-y-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                <div className="flex items-center gap-2 border-b border-[#c4c7c7]/20 pb-4">
+                  <Sliders className="h-4 w-4 text-[#4b41e1]" />
+                  <span className="label-caps text-[#0d0d0d]">Bidding Directives</span>
                 </div>
+
+                <p className="text-[11px] leading-[1.6] text-[#444748] text-left font-sans">
+                  Apply global algorithmic parameters to active loops in parallel.
+                </p>
+
+                <div className="space-y-5 pt-2">
+                  <div className="space-y-2 text-left">
+                    <div className="flex justify-between text-[11px] font-bold text-[#444748] uppercase">
+                      <span>Reserve Markup</span>
+                      <span className="text-[#4b41e1] font-mono">
+                        {(markupMultiplier >= 1.0 ? "+" : "") + ((markupMultiplier - 1.0) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.95"
+                      max="1.15"
+                      step="0.005"
+                      value={markupMultiplier}
+                      onChange={(e) => setMarkupMultiplier(Number(e.target.value))}
+                      className="w-full h-1 bg-[#fdf8f8] rounded-full appearance-none cursor-pointer accent-[#4b41e1]"
+                    />
+                  </div>
+
+                  <div className="space-y-2 text-left">
+                    <div className="flex justify-between text-[11px] font-bold text-[#444748] uppercase">
+                      <span>Concession Slope</span>
+                      <span className="text-[#4b41e1] font-mono">{concessionPace}% / round</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="2"
+                      max="30"
+                      step="1"
+                      value={concessionPace}
+                      onChange={(e) => setConcessionPace(Number(e.target.value))}
+                      className="w-full h-1 bg-[#fdf8f8] rounded-full appearance-none cursor-pointer accent-[#4b41e1]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </motion.div>
+        )}
+
+        {/* LIST SERVICE VIEW */}
+        {sellerView === "add-service" && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="max-w-[640px] mx-auto bg-[#ffffff] border border-[#c4c7c7]/30 p-8 rounded-[0.5rem] space-y-8 shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
+          >
+            <div className="border-b border-[#c4c7c7]/20 pb-4">
+              <span className="label-caps text-[#4b41e1]">Create Listing</span>
+              <h3 className="section-header text-[#0d0d0d] mt-1.5">List New Service Node</h3>
+            </div>
+
+            <form onSubmit={handleCreateListing} className="space-y-6">
+              <div className="flex flex-col gap-2">
+                <label className="label-caps text-[#444748]">Service Name</label>
                 <input
-                  type="range"
-                  min="0.9"
-                  max="1.1"
-                  step="0.005"
-                  value={markupMultiplier}
-                  onChange={(e) => setMarkupMultiplier(Number(e.target.value))}
-                  className="w-full h-1 bg-[#070708] rounded-full appearance-none cursor-pointer accent-[#C5A880]"
+                  type="text"
+                  value={newServiceName}
+                  onChange={(e) => setNewServiceName(e.target.value)}
+                  className="w-full bg-[#fdf8f8] border-b border-[#c4c7c7] px-4 py-3 font-sans text-xs text-[#0d0d0d] focus:outline-none focus:border-[#4b41e1] rounded-sm"
+                  required
                 />
               </div>
 
-              <div className="space-y-2 text-left">
-                <div className="flex items-center justify-between font-sans text-xs font-medium text-[#8E8E93]">
-                  <span>MOQ Waiver leniency</span>
-                  <span className="text-[#C5A880] font-bold font-mono tabular-nums">
-                    {moqLeniency}%
-                  </span>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="label-caps text-[#444748]">Classification</label>
+                  <select
+                    value={newServiceCategory}
+                    onChange={(e) => setNewServiceCategory(e.target.value)}
+                    className="w-full bg-[#fdf8f8] border-b border-[#c4c7c7] px-3 py-3 font-sans text-xs text-[#0d0d0d] focus:outline-none focus:border-[#4b41e1] rounded-sm cursor-pointer"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="label-caps text-[#444748]">Target Valuation ($)</label>
+                  <input
+                    type="number"
+                    value={newServiceRate}
+                    onChange={(e) => setNewServiceRate(Number(e.target.value))}
+                    className="w-full bg-[#fdf8f8] border-b border-[#c4c7c7] px-4 py-3 font-sans text-xs text-[#0d0d0d] focus:outline-none focus:border-[#4b41e1] rounded-sm"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="label-caps text-[#444748]">Duration Target</label>
                 <input
-                  type="range"
-                  min="0"
-                  max="40"
-                  step="1"
-                  value={moqLeniency}
-                  onChange={(e) => setMoqLeniency(Number(e.target.value))}
-                  className="w-full h-1 bg-[#070708] rounded-full appearance-none cursor-pointer accent-[#C5A880]"
+                  type="text"
+                  value={newServiceDuration}
+                  onChange={(e) => setNewServiceDuration(e.target.value)}
+                  placeholder="e.g. 6 Weeks"
+                  className="w-full bg-[#fdf8f8] border-b border-[#c4c7c7] px-4 py-3 font-sans text-xs text-[#0d0d0d] focus:outline-none focus:border-[#4b41e1] rounded-sm"
+                  required
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={isConfigSaving}
-                className="w-full h-9 flex items-center justify-center gap-2 font-sans text-xs font-bold text-black bg-[#C5A880] hover:bg-[#E5D3B3] transition-all cursor-pointer rounded-lg disabled:opacity-40"
+                className="w-full py-4 bg-[#0d0d0d] hover:bg-[#232323] text-white text-[11px] tracking-[0.15em] uppercase font-bold rounded-[0.5rem] transition-all duration-300 cursor-pointer"
               >
-                {isConfigSaving ? "Notifying swarms..." : "Override Policies"}
+                Publish Service Listing
               </button>
             </form>
+          </motion.div>
+        )}
 
-            {configSuccess && (
-              <div className="border border-emerald-500/10 bg-emerald-500/5 p-3 rounded-lg flex items-center gap-2 text-emerald-400 font-sans text-xs justify-center">
-                Policies Overridden OK
+        {/* Opportunity Detail View */}
+        {sellerView === "detail" && selectedOpportunity && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="max-w-[760px] mx-auto bg-[#ffffff] border border-[#c4c7c7]/30 p-10 rounded-[0.5rem] space-y-8"
+          >
+            <div className="border-b border-[#c4c7c7]/20 pb-6 flex justify-between items-start text-left">
+              <div>
+                <span className="label-caps text-[#4b41e1]">Active RFP Match</span>
+                <h3 className="section-header text-[#0d0d0d] mt-1">{selectedOpportunity.buyer}</h3>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
+              <span className="px-2.5 py-1 bg-red-500/10 text-red-600 text-[8px] font-extrabold uppercase tracking-wider rounded-sm">
+                {selectedOpportunity.urgency} URGENCY
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 text-left py-4 border-b border-[#c4c7c7]/20">
+              <div>
+                <span className="block text-[8px] uppercase tracking-wider text-[#444748] font-bold">Category</span>
+                <span className="text-[14px] font-bold text-[#0d0d0d] mt-1 block">{selectedOpportunity.category}</span>
+              </div>
+              <div>
+                <span className="block text-[8px] uppercase tracking-wider text-[#444748] font-bold">Project Duration</span>
+                <span className="text-[14px] font-bold font-mono text-[#0d0d0d] mt-1 block">{selectedOpportunity.duration}</span>
+              </div>
+              <div>
+                <span className="block text-[8px] uppercase tracking-wider text-[#444748] font-bold">Target Budget</span>
+                <span className="text-[14px] font-bold font-mono text-[#4b41e1] mt-1 block">${selectedOpportunity.targetPrice.toLocaleString()}</span>
+              </div>
+              <div>
+                <span className="block text-[8px] uppercase tracking-wider text-[#444748] font-bold">MCDA Confidence Rating</span>
+                <span className="text-[14px] font-bold font-mono text-emerald-600 mt-1 block">{selectedOpportunity.confidence} Fit</span>
+              </div>
+            </div>
+
+            <div className="space-y-4 text-left">
+              <span className="label-caps text-[#444748] block">Concessional Game Strategy</span>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  {
+                    value: "realistic",
+                    label: "Realistic Concession",
+                    desc: "Optimal balanced path ensuring high probability match.",
+                  },
+                  {
+                    value: "boulware",
+                    label: "Boulware Rigid",
+                    desc: "Sustains high starting price, slow concessions.",
+                  },
+                  {
+                    value: "tit_for_tat",
+                    label: "Tit-For-Tat Swarm",
+                    desc: "Mirrors buyer adjustments mathematically.",
+                  },
+                ].map((strat) => (
+                  <div
+                    key={strat.value}
+                    onClick={() => setChosenStrategy(strat.value)}
+                    className={`bg-[#fdf8f8] border p-4 rounded-sm transition-all duration-300 cursor-pointer text-left ${
+                      chosenStrategy === strat.value ? "border-[#4b41e1] bg-[#4b41e1]/[0.01]" : "border-[#c4c7c7]/30 hover:border-[#4b41e1]"
+                    }`}
+                  >
+                    <span className="text-[11px] font-bold text-[#0d0d0d] uppercase tracking-tight block">{strat.label}</span>
+                    <p className="text-[9px] leading-[1.4] text-[#444748] mt-2">{strat.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setSellerView("overview");
+              }}
+              className="w-full py-4 bg-[#0d0d0d] hover:bg-[#232323] text-white text-[10px] tracking-[0.15em] uppercase font-bold rounded-[0.5rem] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              Deploy Bidding Node Swarm
+            </button>
+          </motion.div>
+        )}
+
+        {/* Bidding Negotiation Workspace */}
+        {sellerView === "negotiate" && selectedOpportunity && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="max-w-[800px] mx-auto bg-[#ffffff] border border-[#c4c7c7]/30 p-10 rounded-sm space-y-8 text-left shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
+          >
+            <div className="border-b border-[#c4c7c7]/20 pb-6 flex justify-between items-start">
+              <div>
+                <span className="label-caps text-[#4b41e1]">Algorithmic Concessions</span>
+                <h3 className="section-header text-[#0d0d0d] mt-1">{selectedOpportunity.buyer}</h3>
+              </div>
+              <span className="px-3 py-1 bg-[#4b41e1]/10 text-[#4b41e1] border border-[#4b41e1]/20 text-[9px] uppercase font-bold tracking-wider rounded-sm">
+                ROUND 4 CONVERGENCE
+              </span>
+            </div>
+
+            <div className="p-6 bg-[#fdf8f8] border border-[#c4c7c7]/30 rounded-sm space-y-6">
+              <span className="label-caps text-[#444748] block">Live Convergence Chart</span>
+              
+              <div className="h-20 flex items-center relative">
+                <div className="w-full h-[1px] bg-[#c4c7c7]/60 relative">
+                  <div className="absolute top-1/2 left-[30%] -translate-y-1/2 h-3 w-[1px] bg-red-400" />
+                  <div className="absolute top-1/2 left-[75%] -translate-y-1/2 h-3 w-[1px] bg-[#4b41e1]" />
+                  <div className="absolute top-1/2 left-[30%] right-[25%] -translate-y-1/2 h-2 bg-gradient-to-r from-red-500/20 to-[#4b41e1]/20 rounded-sm" />
+                </div>
+                
+                <span className="absolute left-[30%] -top-4 -translate-x-1/2 text-[9px] font-mono text-red-500 font-bold">Buyer Bid: ${selectedOpportunity.buyerBid.toLocaleString()}</span>
+                <span className="absolute left-[75%] -bottom-4 -translate-x-1/2 text-[9px] font-mono text-[#4b41e1] font-bold">Your Offer: ${selectedOpportunity.currentOffer.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 pt-4">
+              <button
+                onClick={() => setSellerView("overview")}
+                className="py-3 border border-[#4b41e1] hover:bg-[#4b41e1] hover:text-white text-[#4b41e1] text-[9px] tracking-wider uppercase font-bold text-center rounded-[0.5rem] transition-all duration-300 cursor-pointer"
+              >
+                Concede Term & Sign Agreement
+              </button>
+              <button
+                onClick={() => setSellerView("overview")}
+                className="py-3 border border-[#c4c7c7] hover:border-[#ba1a1a] text-[#444748] hover:text-[#ba1a1a] text-[9px] tracking-wider uppercase font-bold text-center rounded-[0.5rem] transition-all duration-300 cursor-pointer"
+              >
+                Reject & Close Loop
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
